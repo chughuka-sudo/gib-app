@@ -30,6 +30,11 @@
             100% { transform: rotateY(720deg); }
         }
 
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
         @keyframes slideUp {
             from { transform: translateY(100px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -56,11 +61,6 @@
             background: #00ff00;
             border-radius: 50%;
             animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.5; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.2); }
         }
 
         .admin-panel {
@@ -328,58 +328,35 @@
             min-height: 250px;
         }
 
-        /* Рулетка */
-        .roulette-wheel {
+        /* Рулетка с цифрами */
+        .roulette-container {
             position: relative;
-            width: 280px;
-            height: 280px;
-            border-radius: 50%;
-            background: conic-gradient(
-                from 0deg,
-                #8B4513 0deg 9.73deg,
-                #ff4444 9.73deg 19.46deg,
-                #8B4513 19.46deg 29.19deg,
-                #000000 29.19deg 38.92deg,
-                #8B4513 38.92deg 48.65deg,
-                #ff4444 48.65deg 58.38deg,
-                #8B4513 58.38deg 68.11deg,
-                #000000 68.11deg 77.84deg,
-                #8B4513 77.84deg 87.57deg,
-                #ff4444 87.57deg 97.3deg,
-                #8B4513 97.3deg 107.03deg,
-                #000000 107.03deg 116.76deg,
-                #8B4513 116.76deg 126.49deg,
-                #ff4444 126.49deg 136.22deg,
-                #8B4513 136.22deg 145.95deg,
-                #000000 145.95deg 155.68deg,
-                #8B4513 155.68deg 165.41deg,
-                #ff4444 165.41deg 175.14deg,
-                #8B4513 175.14deg 184.87deg,
-                #000000 184.87deg 194.6deg,
-                #8B4513 194.6deg 204.33deg,
-                #ff4444 204.33deg 214.06deg,
-                #8B4513 214.06deg 223.79deg,
-                #000000 223.79deg 233.52deg,
-                #8B4513 233.52deg 243.25deg,
-                #ff4444 243.25deg 252.98deg,
-                #8B4513 252.98deg 262.71deg,
-                #000000 262.71deg 272.44deg,
-                #8B4513 272.44deg 282.17deg,
-                #ff4444 282.17deg 291.9deg,
-                #8B4513 291.9deg 301.63deg,
-                #000000 301.63deg 311.36deg,
-                #8B4513 311.36deg 321.09deg,
-                #ff4444 321.09deg 330.82deg,
-                #8B4513 330.82deg 340.55deg,
-                #000000 340.55deg 350.28deg,
-                #008800 350.28deg 360deg
-            );
-            box-shadow: 0 0 20px rgba(0, 180, 255, 0.5);
-            transition: transform 2s cubic-bezier(0.2, 0.9, 0.1, 1.1);
+            width: 320px;
+            height: 320px;
+            margin: 0 auto;
         }
 
-        .roulette-wheel.spinning {
-            transform: rotate(1440deg);
+        .roulette-wheel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #2a2a2a;
+            transition: transform 3s cubic-bezier(0.2, 0.9, 0.1, 1.1);
+        }
+
+        .roulette-slice {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 1px black;
         }
 
         .roulette-marker {
@@ -392,7 +369,19 @@
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
             border-top: 20px solid #ffd700;
-            z-index: 3;
+            z-index: 10;
+        }
+
+        .roulette-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #ffd700;
+            border-radius: 50%;
+            z-index: 5;
         }
 
         /* Монетка */
@@ -407,19 +396,108 @@
             font-size: 48px;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
             transition: transform 0.6s ease;
+            cursor: pointer;
         }
 
         .coin.spinning {
             animation: coinSpin 1s ease-in-out;
         }
 
+        /* DreamCatcher колесо */
+        .dream-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
+        }
+
+        .dream-wheel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #ff4444 0deg 60deg,
+                #00ff44 60deg 120deg,
+                #4444ff 120deg 180deg,
+                #ffff44 180deg 240deg,
+                #ff44ff 240deg 300deg,
+                #44ffff 300deg 360deg
+            );
+            transition: transform 3s cubic-bezier(0.2, 0.9, 0.1, 1.1);
+        }
+
+        .dream-wheel.spinning {
+            transform: rotate(1440deg);
+        }
+
+        .dream-marker {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid #ffd700;
+            z-index: 10;
+        }
+
+        /* Краш новый */
+        .crash-container {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .crash-multiplier {
+            font-size: 64px;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            margin: 20px 0;
+        }
+
+        .crash-graph {
+            width: 100%;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crash-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .crash-cashout-btn {
+            background: linear-gradient(135deg, #00ff00, #00cc00);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 40px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
         /* Минное поле */
         .mines-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            margin: 20px;
-            max-width: 400px;
+            margin: 10px;
+            max-width: 300px;
         }
 
         .mine-cell {
@@ -445,6 +523,47 @@
 
         .mine-cell.gem {
             background: #00ff44;
+        }
+
+        .mines-cashout {
+            background: linear-gradient(135deg, #00ff00, #00cc00);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: none;
+            margin-top: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Сапёр */
+        .sapper-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            margin: 10px;
+            max-width: 350px;
+        }
+
+        .sapper-cell {
+            aspect-ratio: 1;
+            background: rgba(0, 180, 255, 0.2);
+            border: 1px solid #00b4ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .sapper-cell.revealed {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .sapper-cell.mine {
+            background: #ff4444;
         }
 
         .game-panel {
@@ -487,68 +606,6 @@
         .bet-btn:active {
             transform: scale(0.95);
             background: rgba(0, 180, 255, 0.3);
-        }
-
-        .condition-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .condition-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 180, 255, 0.3);
-            border-radius: 12px;
-            padding: 10px 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .condition-btn.selected {
-            background: rgba(0, 180, 255, 0.3);
-            border-color: #00b4ff;
-            color: #00b4ff;
-        }
-
-        .number-selector {
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
-        }
-
-        .numbers-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .num-btn {
-            background: rgba(0, 180, 255, 0.15);
-            border: 1px solid rgba(0, 180, 255, 0.3);
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .num-btn.selected {
-            background: rgba(0, 180, 255, 0.5);
-            border-color: #00b4ff;
-            color: #00b4ff;
-        }
-
-        .selected-numbers {
-            margin-top: 10px;
-            font-size: 12px;
-            color: #aaa;
-            text-align: center;
         }
 
         .amount-input {
@@ -620,20 +677,6 @@
             background: linear-gradient(135deg, #ffd700, #ff8c00);
             color: #1a1a2e;
         }
-
-        .danger-btn {
-            background: linear-gradient(135deg, #ff4444, #cc0000);
-        }
-
-        .stars-price {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(0,0,0,0.3);
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
     </style>
 </head>
 <body>
@@ -696,6 +739,7 @@
                         <div class="game-card" onclick="openGame('coin')"><div class="game-emoji">🪙</div><div class="game-name">Орёл/Решка</div></div>
                         <div class="game-card" onclick="openGame('dream')"><div class="game-emoji">🪄</div><div class="game-name">DreamCatcher</div></div>
                         <div class="game-card" onclick="openGame('mines')"><div class="game-emoji">💣</div><div class="game-name">Минное поле</div></div>
+                        <div class="game-card" onclick="openGame('sapper')"><div class="game-emoji">🔍</div><div class="game-name">Сапёр (x2)</div></div>
                     </div>
                 </div>
 
@@ -763,12 +807,6 @@
             <div class="conditions-panel">
                 <div style="font-weight: bold; margin-bottom: 10px;">🎯 Условие</div>
                 <div class="condition-buttons" id="conditionButtons"></div>
-                <div id="customCrashInput" style="display: none;">
-                    <div class="custom-number-input" style="display: flex; gap: 10px;">
-                        <input type="number" id="customMultiplier" placeholder="Свой x (2-999)" step="1" style="flex:1; background: rgba(0,0,0,0.5); border:1px solid #00b4ff; border-radius:12px; padding:10px; color:white;">
-                        <button onclick="setCustomCrash()" style="background: rgba(0,180,255,0.3); border:1px solid #00b4ff; border-radius:12px; padding:10px 15px; color:#00b4ff;">Уст</button>
-                    </div>
-                </div>
                 <div id="numberSelector" style="display: none;">
                     <div class="number-selector">
                         <div style="text-align: center; margin-bottom: 5px;">Выберите числа (до 7)</div>
@@ -778,11 +816,10 @@
                 </div>
                 <div id="minesSelector" style="display: none;">
                     <div class="number-selector">
-                        <div style="text-align: center; margin-bottom: 5px;">Выберите сложность (количество мин)</div>
+                        <div style="text-align: center; margin-bottom: 5px;">Выберите сложность</div>
                         <div style="display: flex; gap: 10px; justify-content: center;">
-                            <button class="condition-btn" onclick="selectMinesDifficulty(5)">5 мин (x1.3)</button>
-                            <button class="condition-btn" onclick="selectMinesDifficulty(10)">10 мин (x2)</button>
-                            <button class="condition-btn" onclick="selectMinesDifficulty(15)">15 мин (x5)</button>
+                            <button class="condition-btn" onclick="selectMinesDifficulty(5)">Лёгкий (5 мин)</button>
+                            <button class="condition-btn" onclick="selectMinesDifficulty(10)">Сложный (10 мин)</button>
                         </div>
                     </div>
                 </div>
@@ -807,7 +844,6 @@
         </div>
     </div>
 
-    <!-- Админ панель (только для ADMIN_ID) -->
     <div id="adminPanel" class="admin-panel" style="display: none;">
         <div class="admin-btn" onclick="adminGiveTokens()">➕ Выдать токены</div>
         <div class="admin-btn" onclick="adminGivePremium()">💎 Выдать премиум</div>
@@ -821,7 +857,7 @@
         tg.expand();
         
         const user = tg.initDataUnsafe?.user || { id: 0, first_name: "Гость" };
-        const ADMIN_ID = 6156828092; // Ваш ID
+        const ADMIN_ID = 6156828092;
         const isAdmin = (user.id == ADMIN_ID);
         
         document.getElementById("username").innerText = user.first_name || "Игрок";
@@ -850,8 +886,7 @@
         }
         
         function updateOnlineCount() {
-            let count = 1;
-            document.getElementById("onlineCount").innerText = count;
+            document.getElementById("onlineCount").innerText = "1";
             setTimeout(updateOnlineCount, 30000);
         }
         updateOnlineCount();
@@ -866,13 +901,30 @@
         let currentGame = null;
         let selectedCondition = null;
         let selectedNumbers = [];
-        let customCrashValue = null;
         let selectedMinesDifficulty = null;
-        let gameHistory = { roulette: [], crash: [], coin: [], dream: [], mines: [] };
+        let gameHistory = { roulette: [], crash: [], coin: [], dream: [], mines: [], sapper: [] };
+        
+        // Краш переменные
+        let crashActive = false;
+        let crashCurrentMultiplier = 1;
+        let crashBetAmount = 0;
+        let crashAnimationInterval = null;
+        let crashGraphInterval = null;
+        
+        // Минное поле переменные
         let minesGameActive = false;
         let minesCells = [];
         let minesRevealed = 0;
-        let minesTotalGems = 0;
+        let minesTotalCells = 25;
+        let minesCurrentMultiplier = 1;
+        let minesBetAmount = 0;
+        let minesDifficulty = 5;
+        
+        // Сапёр переменные
+        let sapperGameActive = false;
+        let sapperGrid = [];
+        let sapperRevealed = [];
+        let sapperBetAmount = 0;
         
         let lootTimerInterval = null;
         let bonusTimerInterval = null;
@@ -1051,14 +1103,11 @@
             document.getElementById("streak-day").innerText = dailyBonus.streak;
         }
         
-        // Покупка Premium за Telegram Stars
         function buyPremiumStars() {
             if (userData.isPremium) {
                 showToast("❌ У вас уже есть Premium!", true);
                 return;
             }
-            
-            // Отправляем запрос на оплату через Telegram Stars
             tg.sendInvoice({
                 title: "💎 GLB Premium",
                 description: "Premium навсегда: 0% налоги, ускоренный лут (1 час), больше слотов в играх",
@@ -1073,7 +1122,6 @@
             });
         }
         
-        // Обработка успешной оплаты
         tg.onEvent("paymentSuccess", (event) => {
             try {
                 const payload = JSON.parse(event.payload);
@@ -1104,12 +1152,10 @@
                 showToast("❌ Введите корректный ID и сумму!", true);
                 return;
             }
-            
             if (targetId == user.id) {
                 showToast("❌ Нельзя перевести самому себе!", true);
                 return;
             }
-            
             if (userData.tokens < amount) {
                 showToast(`❌ Не хватает ${amount.toLocaleString()}💰!`, true);
                 return;
@@ -1117,7 +1163,6 @@
             
             const targetKey = `glb_user_${targetId}`;
             const targetData = localStorage.getItem(targetKey);
-            
             if (!targetData) {
                 showToast("❌ Пользователь не найден! Возможно, он ещё не запускал приложение.", true);
                 return;
@@ -1144,83 +1189,231 @@
             document.getElementById("transferAmount").value = "";
         }
         
-        function setCustomCrash() {
-            const input = document.getElementById("customMultiplier");
-            let val = parseFloat(input.value);
-            if (val && val >= 2 && val <= 999) {
-                customCrashValue = val;
-                selectedCondition = `custom_${val}`;
-                document.querySelectorAll(".condition-btn").forEach(b => b.classList.remove("selected"));
-                showToast(`✅ Установлен свой множитель: x${val}`, false);
-            } else {
-                showToast("❌ Введите число от 2 до 999", true);
+        // Рулетка с цифрами
+        function createRouletteVisual() {
+            const container = document.getElementById("gameVisual");
+            const numbers = [...Array(37).keys()];
+            const colors = numbers.map(n => {
+                if (n === 0) return "#008800";
+                const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+                return reds.includes(n) ? "#ff4444" : "#000000";
+            });
+            
+            let html = `<div class="roulette-container">
+                <div class="roulette-wheel" id="rouletteWheel" style="transform: rotate(0deg);">`;
+            
+            const angleStep = 360 / 37;
+            for (let i = 0; i < numbers.length; i++) {
+                const angle = i * angleStep;
+                html += `<div class="roulette-slice" style="transform: rotate(${angle}deg); background: conic-gradient(from 0deg, ${colors[i]} 0deg, ${colors[i]} ${angleStep}deg);"><span style="transform: rotate(90deg);">${numbers[i]}</span></div>`;
+            }
+            
+            html += `</div><div class="roulette-marker"></div><div class="roulette-center"></div></div>`;
+            container.innerHTML = html;
+        }
+        
+        function spinRoulette(callback) {
+            const wheel = document.getElementById("rouletteWheel");
+            if (!wheel) { callback(); return; }
+            const spins = 5 + Math.random() * 5;
+            const finalRotation = spins * 360 + Math.random() * 360;
+            wheel.style.transform = `rotate(${finalRotation}deg)`;
+            setTimeout(() => {
+                if (callback) callback();
+            }, 3000);
+        }
+        
+        // Краш новый
+        function createCrashVisual() {
+            const container = document.getElementById("gameVisual");
+            container.innerHTML = `
+                <div class="crash-container">
+                    <div class="crash-multiplier" id="crashMultiplier">x1.00</div>
+                    <div class="crash-graph" id="crashGraph">
+                        <canvas id="crashCanvas" width="350" height="150" style="width: 100%; height: 100%; background: rgba(0,0,0,0.3); border-radius: 12px;"></canvas>
+                    </div>
+                    <button class="crash-cashout-btn" id="cashoutBtn">ЗАБРАТЬ 💰</button>
+                </div>
+            `;
+            
+            document.getElementById("cashoutBtn").onclick = () => cashoutCrash();
+            
+            const canvas = document.getElementById("crashCanvas");
+            if (canvas) {
+                canvas.width = 350;
+                canvas.height = 150;
             }
         }
         
-        function selectMinesDifficulty(difficulty) {
-            selectedMinesDifficulty = difficulty;
-            let multiplier = difficulty === 5 ? 1.3 : (difficulty === 10 ? 2 : 5);
-            showToast(`✅ ${difficulty} мин, множитель x${multiplier}`, false);
-            document.getElementById("minesSelector").style.display = "none";
+        function startCrashSimulation() {
+            crashCurrentMultiplier = 1;
+            crashActive = true;
+            
+            if (crashAnimationInterval) clearInterval(crashAnimationInterval);
+            if (crashGraphInterval) clearInterval(crashGraphInterval);
+            
+            crashAnimationInterval = setInterval(() => {
+                if (!crashActive) return;
+                crashCurrentMultiplier += 0.03 + Math.random() * 0.07;
+                document.getElementById("crashMultiplier").innerHTML = `x${crashCurrentMultiplier.toFixed(2)}`;
+                
+                const canvas = document.getElementById("crashCanvas");
+                if (canvas) {
+                    const ctx = canvas.getContext("2d");
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const height = canvas.height;
+                    const progress = Math.min(crashCurrentMultiplier / 20, 1);
+                    const y = height - (progress * height);
+                    ctx.beginPath();
+                    ctx.moveTo(0, canvas.height);
+                    ctx.lineTo(canvas.width * (crashCurrentMultiplier / 100), y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.fillStyle = "#00ff00";
+                    ctx.fill();
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(canvas.width * 0.8, 10, 60, 30);
+                    ctx.fillStyle = "black";
+                    ctx.font = "14px Arial";
+                    ctx.fillText(`${crashCurrentMultiplier.toFixed(2)}x`, canvas.width * 0.82, 32);
+                }
+                
+                if (crashCurrentMultiplier > 50 && Math.random() < 0.01) {
+                    endCrashGame(false);
+                } else if (crashCurrentMultiplier > 100 && Math.random() < 0.02) {
+                    endCrashGame(false);
+                } else if (crashCurrentMultiplier > 500 && Math.random() < 0.05) {
+                    endCrashGame(false);
+                }
+            }, 50);
         }
         
-        function createRouletteVisual() {
+        function cashoutCrash() {
+            if (!crashActive) {
+                showToast("❌ Игра уже закончена!", true);
+                return;
+            }
+            endCrashGame(true);
+        }
+        
+        function endCrashGame(isWin) {
+            crashActive = false;
+            if (crashAnimationInterval) clearInterval(crashAnimationInterval);
+            if (crashGraphInterval) clearInterval(crashGraphInterval);
+            
+            if (isWin) {
+                let winAmount = Math.floor(crashBetAmount * crashCurrentMultiplier);
+                let tax = Math.floor(winAmount * 0.05);
+                let afterTax = winAmount - tax;
+                userData.tokens += afterTax;
+                userData.total_wins++;
+                updateUI();
+                saveUserData();
+                addToHistory('crash', `Краш на x${crashCurrentMultiplier.toFixed(2)} → ВЫИГРЫШ → +${afterTax.toLocaleString()}💰`);
+                document.getElementById("resultArea").innerHTML = `🎉 ПОБЕДА! Вы забрали x${crashCurrentMultiplier.toFixed(2)}\n💰 +${afterTax.toLocaleString()}💰 (-${tax}💰 налог)`;
+                showToast(`✅ ПОБЕДА! +${afterTax.toLocaleString()}💰`, false);
+            } else {
+                addToHistory('crash', `Краш на x${crashCurrentMultiplier.toFixed(2)} → ПРОИГРЫШ (не успел забрать)`);
+                document.getElementById("resultArea").innerHTML = `💀 ПРОИГРЫШ! Краш на x${crashCurrentMultiplier.toFixed(2)}\n💰 -${crashBetAmount.toLocaleString()}💰`;
+                showToast(`❌ ПРОИГРЫШ! -${crashBetAmount.toLocaleString()}💰`, true);
+            }
+            setTimeout(() => closeGame(), 3000);
+        }
+        
+        // DreamCatcher визуальный
+        function createDreamVisual() {
             const container = document.getElementById("gameVisual");
-            container.innerHTML = `
-                <div style="position: relative; width: 280px; height: 280px; margin: 0 auto;">
-                    <div id="rouletteWheel" class="roulette-wheel"></div>
-                    <div class="roulette-marker"></div>
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: #1a1a2e; border-radius: 50%; border: 2px solid #ffd700; z-index: 2;"></div>
-                </div>
-            `;
+            const segments = [2, 3, 5, 10, 20, 40];
+            const colors = ["#ff4444", "#00ff44", "#4444ff", "#ffff44", "#ff44ff", "#44ffff"];
+            
+            let html = `<div class="dream-container">
+                <div class="dream-wheel" id="dreamWheel" style="transform: rotate(0deg); background: conic-gradient(`;
+            for (let i = 0; i < segments.length; i++) {
+                html += `${colors[i]} ${i * 60}deg ${(i + 1) * 60}deg,`;
+            }
+            html = html.slice(0, -1) + `);"></div>
+                <div class="dream-marker"></div>
+                <div class="roulette-center"></div>
+            </div>`;
+            container.innerHTML = html;
         }
         
+        function spinDream(callback) {
+            const wheel = document.getElementById("dreamWheel");
+            if (!wheel) { callback(); return; }
+            const spins = 5 + Math.random() * 5;
+            const finalRotation = spins * 360 + Math.random() * 360;
+            wheel.style.transform = `rotate(${finalRotation}deg)`;
+            setTimeout(() => {
+                if (callback) callback();
+            }, 3000);
+        }
+        
+        // Монетка
         function createCoinVisual() {
             const container = document.getElementById("gameVisual");
-            container.innerHTML = `
-                <div id="coin" class="coin">🦅</div>
-            `;
+            container.innerHTML = `<div id="coin" class="coin">🦅</div>`;
         }
         
+        function spinCoin(callback) {
+            const coin = document.getElementById("coin");
+            if (!coin) { callback(); return; }
+            coin.classList.add("spinning");
+            setTimeout(() => {
+                coin.classList.remove("spinning");
+                if (callback) callback();
+            }, 1000);
+        }
+        
+        // Минное поле
         function createMinesVisual() {
             const container = document.getElementById("gameVisual");
             container.innerHTML = `
-                <div class="mines-grid" id="minesGrid"></div>
-                <div style="text-align: center; margin-top: 10px;">
-                    💎 Найдено сокровищ: <span id="gemsFound">0</span> / <span id="totalGems">0</span>
+                <div>
+                    <div class="mines-grid" id="minesGrid"></div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        💎 Найдено: <span id="gemsFound">0</span> / <span id="totalGems">0</span>
+                        <span id="currentMultiplier" style="margin-left: 10px;">Множитель: x1.00</span>
+                    </div>
+                    <button class="mines-cashout" id="minesCashoutBtn" style="display: none;">ЗАБРАТЬ 💰</button>
                 </div>
             `;
+            
+            document.getElementById("minesCashoutBtn").onclick = () => cashoutMines();
         }
         
         function initMinesGame() {
-            const totalCells = 30;
+            minesTotalCells = 25;
             minesCells = [];
-            for (let i = 0; i < totalCells; i++) {
+            for (let i = 0; i < minesTotalCells; i++) {
                 minesCells.push({ type: "hidden", revealed: false });
             }
             
             let minesPlaced = 0;
-            while (minesPlaced < selectedMinesDifficulty) {
-                const pos = Math.floor(Math.random() * totalCells);
+            while (minesPlaced < minesDifficulty) {
+                const pos = Math.floor(Math.random() * minesTotalCells);
                 if (minesCells[pos].type !== "mine") {
                     minesCells[pos].type = "mine";
                     minesPlaced++;
                 }
             }
             
-            for (let i = 0; i < totalCells; i++) {
+            for (let i = 0; i < minesTotalCells; i++) {
                 if (minesCells[i].type !== "mine") {
                     minesCells[i].type = "gem";
                 }
             }
             
-            minesTotalGems = totalCells - selectedMinesDifficulty;
+            const totalGems = minesTotalCells - minesDifficulty;
             minesRevealed = 0;
             minesGameActive = true;
+            minesCurrentMultiplier = 1;
+            
+            document.getElementById("gemsFound").innerText = "0";
+            document.getElementById("totalGems").innerText = totalGems;
+            document.getElementById("currentMultiplier").innerHTML = `Множитель: x1.00`;
+            document.getElementById("minesCashoutBtn").style.display = "none";
             
             renderMinesGrid();
-            document.getElementById("gemsFound").innerText = "0";
-            document.getElementById("totalGems").innerText = minesTotalGems;
         }
         
         function renderMinesGrid() {
@@ -1256,140 +1449,201 @@
             if (minesCells[index].type === "mine") {
                 minesGameActive = false;
                 renderMinesGrid();
-                showToast("💥 БАМ! Вы наступили на мину!", true);
                 addToHistory('mines', `ПРОИГРЫШ! Наступил на мину`);
-                document.getElementById("resultArea").innerHTML = `💥 ВЗРЫВ! Вы наступили на мину!\n💰 Потеряно: ставка`;
-                setTimeout(() => closeGame(), 2000);
+                document.getElementById("resultArea").innerHTML = `💥 ВЗРЫВ! Вы наступили на мину!\n💰 Потеряно: ${minesBetAmount.toLocaleString()}💰`;
+                showToast(`💥 ВЗРЫВ! Вы проиграли ${minesBetAmount.toLocaleString()}💰`, true);
+                setTimeout(() => closeGame(), 3000);
                 return;
             }
             
             minesRevealed++;
+            
+            // Расчёт множителя
+            const totalGems = minesTotalCells - minesDifficulty;
+            if (minesDifficulty === 5) {
+                // Лёгкий: +0.2x за каждую найденную
+                minesCurrentMultiplier = 1 + (minesRevealed * 0.2);
+            } else {
+                // Сложный: +0.5x за каждую найденную
+                minesCurrentMultiplier = 1 + (minesRevealed * 0.5);
+            }
+            
             renderMinesGrid();
             document.getElementById("gemsFound").innerText = minesRevealed;
+            document.getElementById("currentMultiplier").innerHTML = `Множитель: x${minesCurrentMultiplier.toFixed(2)}`;
             
-            if (minesRevealed === minesTotalGems) {
-                minesGameActive = false;
-                let multiplier = selectedMinesDifficulty === 5 ? 1.3 : (selectedMinesDifficulty === 10 ? 2 : 5);
-                let bet = parseInt(document.getElementById("betAmount").value) || 0;
-                let winAmount = bet * multiplier;
-                let tax = Math.floor(winAmount * 0.05);
-                let afterTax = winAmount - tax;
-                userData.tokens += afterTax;
-                userData.total_wins++;
-                updateUI();
-                saveUserData();
-                addToHistory('mines', `ВЫИГРЫШ! Найдены все сокровища! x${multiplier} → +${afterTax.toLocaleString()}💰`);
-                document.getElementById("resultArea").innerHTML = `🎉 ПОБЕДА! Вы нашли все сокровища!\n💰 +${afterTax.toLocaleString()}💰 (-${tax}💰 налог)`;
-                showToast(`✅ ПОБЕДА! +${afterTax.toLocaleString()}💰`, false);
-                setTimeout(() => closeGame(), 2000);
+            if (minesRevealed >= 5) {
+                document.getElementById("minesCashoutBtn").style.display = "block";
+            }
+            
+            if (minesRevealed === totalGems) {
+                cashoutMines();
             }
         }
         
-        function createCrashVisual() {
+        function cashoutMines() {
+            if (!minesGameActive) return;
+            minesGameActive = false;
+            
+            let winAmount = Math.floor(minesBetAmount * minesCurrentMultiplier);
+            let tax = Math.floor(winAmount * 0.05);
+            let afterTax = winAmount - tax;
+            userData.tokens += afterTax;
+            userData.total_wins++;
+            updateUI();
+            saveUserData();
+            addToHistory('mines', `ВЫИГРЫШ! Найдено ${minesRevealed} сокровищ → x${minesCurrentMultiplier.toFixed(2)} → +${afterTax.toLocaleString()}💰`);
+            document.getElementById("resultArea").innerHTML = `🎉 ПОБЕДА! Вы нашли ${minesRevealed} сокровищ!\n💰 +${afterTax.toLocaleString()}💰 (-${tax}💰 налог)`;
+            showToast(`✅ ПОБЕДА! +${afterTax.toLocaleString()}💰`, false);
+            setTimeout(() => closeGame(), 3000);
+        }
+        
+        // Сапёр
+        function createSapperVisual() {
             const container = document.getElementById("gameVisual");
             container.innerHTML = `
-                <div style="width: 100%; height: 180px; background: rgba(0,0,0,0.5); border-radius: 16px; position: relative;">
-                    <canvas id="crashCanvas" width="400" height="180" style="width: 100%; height: 100%; background: rgba(0,0,0,0.5); border-radius: 16px;"></canvas>
-                    <div id="crashMultiplier" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 20px; font-size: 24px; font-weight: bold; color: #00b4ff;">x1.00</div>
-                </div>
-                <div style="margin-top: 10px; text-align: center; font-size: 12px; color: #aaa;">
-                    ⚡ Краш идёт вверх! Заберите выигрыш вовремя!
+                <div>
+                    <div class="sapper-grid" id="sapperGrid"></div>
+                    <div style="text-align: center; margin-top: 10px;">💣 Откройте все безопасные клетки! 💣</div>
                 </div>
             `;
-            const canvas = document.getElementById("crashCanvas");
-            if (canvas) {
-                canvas.width = 400;
-                canvas.height = 180;
-                drawCrashGraph(1);
-            }
+            initSapperGame();
         }
         
-        let crashAnimation = null;
-        let crashValue = 1;
-        let crashActive = false;
-        let crashBetAmount = 0;
-        let crashTargetMultiplier = 1;
-        
-        function drawCrashGraph(mult) {
-            const canvas = document.getElementById("crashCanvas");
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function initSapperGame() {
+            const size = 8;
+            const mineCount = 10;
+            sapperGrid = [];
+            sapperRevealed = [];
             
-            const w = canvas.width;
-            const h = canvas.height;
-            
-            ctx.beginPath();
-            ctx.moveTo(0, h);
-            for (let x = 0; x <= w; x++) {
-                let t = x / w;
-                let yVal = Math.pow(1 + t * 9, 1.5);
-                let y = h - (Math.min(yVal, 20) / 20) * h;
-                ctx.lineTo(x, y);
-            }
-            ctx.strokeStyle = "#00b4ff";
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            const currentMult = document.getElementById("crashMultiplier");
-            if (currentMult) currentMult.innerText = `x${mult.toFixed(2)}`;
-        }
-        
-        function startCrashSimulation() {
-            crashValue = 1;
-            crashActive = true;
-            if (crashAnimation) clearInterval(crashAnimation);
-            
-            crashAnimation = setInterval(() => {
-                if (!crashActive) {
-                    clearInterval(crashAnimation);
-                    return;
+            for (let i = 0; i < size; i++) {
+                sapperGrid[i] = [];
+                sapperRevealed[i] = [];
+                for (let j = 0; j < size; j++) {
+                    sapperGrid[i][j] = 0;
+                    sapperRevealed[i][j] = false;
                 }
-                crashValue += 0.05 + Math.random() * 0.1;
-                drawCrashGraph(crashValue);
+            }
+            
+            let mines = 0;
+            while (mines < mineCount) {
+                const x = Math.floor(Math.random() * size);
+                const y = Math.floor(Math.random() * size);
+                if (sapperGrid[x][y] !== -1) {
+                    sapperGrid[x][y] = -1;
+                    mines++;
+                }
+            }
+            
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    if (sapperGrid[i][j] === -1) continue;
+                    let count = 0;
+                    for (let dx = -1; dx <= 1; dx++) {
+                        for (let dy = -1; dy <= 1; dy++) {
+                            if (dx === 0 && dy === 0) continue;
+                            const nx = i + dx, ny = j + dy;
+                            if (nx >= 0 && nx < size && ny >= 0 && ny < size && sapperGrid[nx][ny] === -1) count++;
+                        }
+                    }
+                    sapperGrid[i][j] = count;
+                }
+            }
+            
+            renderSapperGrid();
+            sapperGameActive = true;
+        }
+        
+        function renderSapperGrid() {
+            const grid = document.getElementById("sapperGrid");
+            if (!grid) return;
+            grid.innerHTML = "";
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    const cell = document.createElement("div");
+                    cell.className = "sapper-cell";
+                    if (sapperRevealed[i][j]) {
+                        cell.classList.add("revealed");
+                        if (sapperGrid[i][j] === -1) {
+                            cell.classList.add("mine");
+                            cell.innerText = "💣";
+                        } else {
+                            cell.innerText = sapperGrid[i][j] === 0 ? "" : sapperGrid[i][j];
+                        }
+                    } else {
+                        cell.innerText = "?";
+                    }
+                    cell.onclick = () => revealSapperCell(i, j);
+                    grid.appendChild(cell);
+                }
+            }
+        }
+        
+        function revealSapperCell(x, y) {
+            if (!sapperGameActive) return;
+            if (sapperRevealed[x][y]) return;
+            
+            if (sapperGrid[x][y] === -1) {
+                sapperRevealed[x][y] = true;
+                renderSapperGrid();
+                addToHistory('sapper', `ПРОИГРЫШ! Наступил на мину`);
+                document.getElementById("resultArea").innerHTML = `💥 ВЗРЫВ! Вы наступили на мину!\n💰 Потеряно: ${sapperBetAmount.toLocaleString()}💰`;
+                showToast(`💥 ВЗРЫВ! Вы проиграли ${sapperBetAmount.toLocaleString()}💰`, true);
+                sapperGameActive = false;
+                setTimeout(() => closeGame(), 3000);
+                return;
+            }
+            
+            const reveal = (cx, cy) => {
+                if (cx < 0 || cx >= 8 || cy < 0 || cy >= 8) return;
+                if (sapperRevealed[cx][cy]) return;
+                if (sapperGrid[cx][cy] === -1) return;
                 
-                if (crashValue > 50 && Math.random() < 0.08) {
-                    clearInterval(crashAnimation);
-                    crashActive = false;
-                    document.getElementById("crashMultiplier").innerHTML = `💥 КРАШ! x${crashValue.toFixed(2)}`;
-                    endCrashGame(false);
-                } else if (crashValue > 100 && Math.random() < 0.15) {
-                    clearInterval(crashAnimation);
-                    crashActive = false;
-                    document.getElementById("crashMultiplier").innerHTML = `💥 КРАШ! x${crashValue.toFixed(2)}`;
-                    endCrashGame(false);
-                } else if (crashValue > 500 && Math.random() < 0.25) {
-                    clearInterval(crashAnimation);
-                    crashActive = false;
-                    document.getElementById("crashMultiplier").innerHTML = `💥 КРАШ! x${crashValue.toFixed(2)}`;
-                    endCrashGame(false);
-                } else if (crashValue > 1000) {
-                    clearInterval(crashAnimation);
-                    crashActive = false;
-                    document.getElementById("crashMultiplier").innerHTML = `💥 МЕГА КРАШ! x${crashValue.toFixed(2)}`;
-                    endCrashGame(false);
+                sapperRevealed[cx][cy] = true;
+                
+                if (sapperGrid[cx][cy] === 0) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        for (let dy = -1; dy <= 1; dy++) {
+                            if (dx === 0 && dy === 0) continue;
+                            reveal(cx + dx, cy + dy);
+                        }
+                    }
                 }
-            }, 50);
-        }
-        
-        function endCrashGame(isWin) {
-            if (isWin) {
-                let winAmount = crashBetAmount * crashTargetMultiplier;
+            };
+            
+            reveal(x, y);
+            renderSapperGrid();
+            
+            let allSafeRevealed = true;
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    if (sapperGrid[i][j] !== -1 && !sapperRevealed[i][j]) {
+                        allSafeRevealed = false;
+                    }
+                }
+            }
+            
+            if (allSafeRevealed) {
+                let winAmount = sapperBetAmount * 2;
                 let tax = Math.floor(winAmount * 0.05);
                 let afterTax = winAmount - tax;
                 userData.tokens += afterTax;
                 userData.total_wins++;
                 updateUI();
                 saveUserData();
-                addToHistory('crash', `Краш на x${crashValue.toFixed(2)} → ВЫИГРЫШ x${crashTargetMultiplier} → +${afterTax.toLocaleString()}💰`);
-                document.getElementById("resultArea").innerHTML = `🎉 ПОБЕДА! Краш на x${crashValue.toFixed(2)}\n💰 +${afterTax.toLocaleString()}💰 (-${tax}💰 налог)`;
+                addToHistory('sapper', `ВЫИГРЫШ! Сапёр пройден → +${afterTax.toLocaleString()}💰`);
+                document.getElementById("resultArea").innerHTML = `🎉 ПОБЕДА! Вы прошли сапёр!\n💰 +${afterTax.toLocaleString()}💰 (-${tax}💰 налог)`;
                 showToast(`✅ ПОБЕДА! +${afterTax.toLocaleString()}💰`, false);
-            } else {
-                addToHistory('crash', `Краш на x${crashValue.toFixed(2)} → ПРОИГРЫШ (цель x${crashTargetMultiplier})`);
-                document.getElementById("resultArea").innerHTML = `💀 ПРОИГРЫШ! Краш на x${crashValue.toFixed(2)}, цель была x${crashTargetMultiplier}\n💰 -${crashBetAmount.toLocaleString()}💰`;
-                showToast(`❌ ПРОИГРЫШ! -${crashBetAmount.toLocaleString()}💰`, true);
+                sapperGameActive = false;
+                setTimeout(() => closeGame(), 3000);
             }
-            setTimeout(() => closeGame(), 2000);
+        }
+        
+        function selectMinesDifficulty(difficulty) {
+            selectedMinesDifficulty = difficulty;
+            minesDifficulty = difficulty;
+            showToast(`✅ ${difficulty === 5 ? "Лёгкий" : "Сложный"} режим выбран`, false);
+            document.getElementById("minesSelector").style.display = "none";
         }
         
         const gameConfig = {
@@ -1411,15 +1665,7 @@
             crash: {
                 title: "💥 Краш",
                 betButtons: [100, 500, 1000, 1500, 2000, 3500, 5000],
-                conditions: [
-                    { label: "x2", value: "2" },
-                    { label: "x3", value: "3" },
-                    { label: "x5", value: "5" },
-                    { label: "x10", value: "10" },
-                    { label: "x20", value: "20" },
-                    { label: "x50", value: "50" },
-                    { label: "🎲 Своё число", value: "custom" }
-                ]
+                conditions: []
             },
             coin: {
                 title: "🪙 Орёл/Решка",
@@ -1446,6 +1692,11 @@
                 title: "💣 Минное поле",
                 betButtons: [100, 500, 1000, 1500, 2000, 3500, 5000],
                 conditions: []
+            },
+            sapper: {
+                title: "🔍 Сапёр (x2)",
+                betButtons: [100, 500, 1000, 1500, 2000, 3500, 5000],
+                conditions: []
             }
         };
         
@@ -1453,7 +1704,6 @@
             currentGame = game;
             selectedCondition = null;
             selectedNumbers = [];
-            customCrashValue = null;
             selectedMinesDifficulty = null;
             const config = gameConfig[game];
             document.getElementById("modalTitle").innerHTML = config.title;
@@ -1461,7 +1711,9 @@
             if (game === 'roulette') createRouletteVisual();
             else if (game === 'crash') createCrashVisual();
             else if (game === 'coin') createCoinVisual();
+            else if (game === 'dream') createDreamVisual();
             else if (game === 'mines') createMinesVisual();
+            else if (game === 'sapper') createSapperVisual();
             else document.getElementById("gameVisual").innerHTML = `<div class="wheel" id="wheel">🎲</div>`;
             
             const betContainer = document.getElementById("betButtons");
@@ -1476,7 +1728,7 @@
             
             const condContainer = document.getElementById("conditionButtons");
             condContainer.innerHTML = "";
-            if (game !== 'mines') {
+            if (game !== 'crash' && game !== 'mines' && game !== 'sapper') {
                 config.conditions.forEach(cond => {
                     const btn = document.createElement("div");
                     btn.className = "condition-btn";
@@ -1485,16 +1737,12 @@
                         document.querySelectorAll(".condition-btn").forEach(b => b.classList.remove("selected"));
                         btn.classList.add("selected");
                         selectedCondition = cond.value;
-                        
-                        document.getElementById("customCrashInput").style.display = cond.value === "custom" ? "block" : "none";
                         document.getElementById("numberSelector").style.display = cond.value === "number" ? "block" : "none";
-                        
                         if (cond.value === "number") initNumberSelector();
-                        if (cond.value === "custom") customCrashValue = null;
                     };
                     condContainer.appendChild(btn);
                 });
-            } else {
+            } else if (game === 'mines') {
                 const btn = document.createElement("div");
                 btn.className = "condition-btn";
                 btn.innerText = "Выбрать сложность";
@@ -1504,7 +1752,6 @@
                 condContainer.appendChild(btn);
             }
             
-            document.getElementById("customCrashInput").style.display = "none";
             document.getElementById("numberSelector").style.display = "none";
             document.getElementById("minesSelector").style.display = "none";
             document.getElementById("resultArea").innerHTML = "Выберите ставку и условие";
@@ -1536,13 +1783,15 @@
         }
         
         function closeGame() {
-            if (crashAnimation) clearInterval(crashAnimation);
+            if (crashAnimationInterval) clearInterval(crashAnimationInterval);
+            if (crashGraphInterval) clearInterval(crashGraphInterval);
             crashActive = false;
+            minesGameActive = false;
+            sapperGameActive = false;
             document.getElementById("gameModal").style.display = "none";
             currentGame = null;
             selectedCondition = null;
             selectedNumbers = [];
-            minesGameActive = false;
         }
         
         function showGameLog() {
@@ -1566,44 +1815,19 @@
             saveUserData();
         }
         
-        function spinRoulette(callback) {
-            const wheel = document.getElementById("rouletteWheel");
-            if (!wheel) { callback(); return; }
-            wheel.classList.add("spinning");
-            setTimeout(() => {
-                wheel.classList.remove("spinning");
-                if (callback) callback();
-            }, 2000);
-        }
-        
-        function spinCoin(callback) {
-            const coin = document.getElementById("coin");
-            if (!coin) { callback(); return; }
-            coin.classList.add("spinning");
-            setTimeout(() => {
-                coin.classList.remove("spinning");
-                if (callback) callback();
-            }, 1000);
-        }
-        
         async function makeBet() {
             if (currentGame === 'mines') {
                 if (!selectedMinesDifficulty) {
-                    showToast("❌ Выберите сложность (количество мин)!", true);
+                    showToast("❌ Выберите сложность!", true);
                     return;
                 }
-            } else if (!selectedCondition) {
+            } else if (currentGame !== 'crash' && currentGame !== 'sapper' && !selectedCondition) {
                 showToast("❌ Выберите условие ставки!", true);
                 return;
             }
             
             if (currentGame === 'roulette' && selectedCondition === "number" && selectedNumbers.length === 0) {
                 showToast("❌ Выберите хотя бы одно число!", true);
-                return;
-            }
-            
-            if (currentGame === 'crash' && selectedCondition === "custom" && !customCrashValue) {
-                showToast("❌ Введите свой множитель!", true);
                 return;
             }
             
@@ -1634,21 +1858,19 @@
             
             if (currentGame === 'crash') {
                 crashBetAmount = totalBet;
-                crashTargetMultiplier = customCrashValue || parseFloat(selectedCondition);
                 startCrashSimulation();
-                const checkInterval = setInterval(() => {
-                    if (!crashActive) {
-                        clearInterval(checkInterval);
-                        endCrashGame(crashValue >= crashTargetMultiplier);
-                    }
-                }, 50);
-                setTimeout(() => closeGame(), 5000);
                 return;
             }
             
             if (currentGame === 'mines') {
+                minesBetAmount = totalBet;
                 initMinesGame();
-                setTimeout(() => closeGame(), 30000);
+                return;
+            }
+            
+            if (currentGame === 'sapper') {
+                sapperBetAmount = totalBet;
+                initSapperGame();
                 return;
             }
             
@@ -1657,8 +1879,6 @@
                 let winAmount = 0;
                 let resultText = "";
                 let finalNumber = 0;
-                let coinResult = "";
-                let dreamResult = 0;
                 
                 if (currentGame === 'roulette') {
                     finalNumber = Math.floor(Math.random() * 37);
@@ -1688,7 +1908,6 @@
                     if (rand < 49) result = "орел";
                     else if (rand < 98) result = "решка";
                     else result = "ребро";
-                    coinResult = result;
                     
                     const coin = document.getElementById("coin");
                     if (coin) {
@@ -1704,15 +1923,14 @@
                 }
                 else if (currentGame === 'dream') {
                     const outcomes = [2,3,5,10,20,40];
-                    const weights = [35,20,15,12,10,8];
-                    let rand = Math.random() * 100;
-                    let sum = 0;
+                    const rand = Math.random() * 100;
                     let result = 2;
-                    for (let i = 0; i < weights.length; i++) {
-                        sum += weights[i];
-                        if (rand < sum) { result = outcomes[i]; break; }
-                    }
-                    dreamResult = result;
+                    if (rand < 35) result = 2;
+                    else if (rand < 55) result = 3;
+                    else if (rand < 70) result = 5;
+                    else if (rand < 82) result = 10;
+                    else if (rand < 92) result = 20;
+                    else result = 40;
                     resultText = `Выпало: ${result}x`;
                     if (parseInt(selectedCondition) === result) {
                         win = true;
@@ -1740,17 +1958,15 @@
             };
             
             if (currentGame === 'roulette') spinRoulette(spinCallback);
+            else if (currentGame === 'dream') spinDream(spinCallback);
             else if (currentGame === 'coin') spinCoin(spinCallback);
             else spinCallback();
-            
-            setTimeout(() => closeGame(), 2500);
         }
         
         function loadTopPlayers() {
             let topPlayers = Object.entries(allUsers)
                 .sort((a, b) => (b[1].tokens || 0) - (a[1].tokens || 0))
                 .slice(0, 10);
-            
             let html = "";
             topPlayers.forEach(([id, data], idx) => {
                 let name = data.name || `ID${id}`;
@@ -1758,19 +1974,15 @@
                 let premium = data.isPremium ? "💎" : "";
                 html += `<div>${idx+1}. ${premium} ${name}: ${tokens}💰</div>`;
             });
-            if (topPlayers.length === 0) {
-                html = "<div>Пока нет игроков</div>";
-            }
+            if (topPlayers.length === 0) html = "<div>Пока нет игроков</div>";
             document.getElementById("top-players").innerHTML = html;
         }
         
-        // Админ функции
         function adminGiveTokens() {
             const targetId = prompt("Введите ID пользователя:");
             if (!targetId) return;
             const amount = parseInt(prompt("Сколько токенов выдать?"));
             if (!amount) return;
-            
             const targetKey = `glb_user_${targetId}`;
             const targetData = localStorage.getItem(targetKey);
             if (targetData) {
@@ -1786,7 +1998,6 @@
         function adminGivePremium() {
             const targetId = prompt("Введите ID пользователя:");
             if (!targetId) return;
-            
             const targetKey = `glb_user_${targetId}`;
             const targetData = localStorage.getItem(targetKey);
             if (targetData) {
@@ -1822,4 +2033,4 @@
         tg.ready();
     </script>
 </body>
-    </html>
+                            </html>
