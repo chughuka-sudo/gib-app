@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GLB RPG Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #0f0f1a 100%);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .card {
+            background: rgba(20, 20, 35, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00f3ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00f3ff, #0066ff);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .game-card {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .game-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .game-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid #00f3ff;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #00f3ff;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.5);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .rank-progress {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .rank-progress-fill {
+            background: linear-gradient(90deg, #00f3ff, #ffd700);
+            height: 100%;
+            width: 0%;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            border-top: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .nav-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .nav-item.active {
+            background: rgba(0, 243, 255, 0.2);
+        }
+
+        .nav-emoji {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 243, 255, 0.9);
+            color: #000;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 1100;
+            display: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="page-dashboard" class="page active-page">
+            <div class="card">
+                <div class="card-header">
+                    <span>👋 Привет, <span id="username">Игрок</span></span>
+                    <span class="badge" id="rank-badge">Водолаз</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">💰 Токены</div>
+                        <div class="stat-value" id="tokens">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">✨ Аура</div>
+                        <div class="stat-value" id="aura">0</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; margin-bottom: 5px;">⭐ Ранг: <span id="rank-name">Водолаз</span></div>
+                    <div class="rank-progress">
+                        <div class="rank-progress-fill" id="rank-progress" style="width: 0%"></div>
+                    </div>
+                    <div style="font-size: 12px; color: #888;" id="rank-next">До следующего ранга: 5000 ауры</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">🎁 Ежедневный бонус</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>📅 День <span id="streak-day">1</span>/7</div>
+                    <button class="btn-outline" onclick="claimDailyBonus()">Забрать</button>
+                </div>
+                <div style="font-size: 12px; color: #888; margin-top: 8px;" id="bonus-timer">Доступно сейчас!</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">⏱️ Лут</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>🎲 Награда: 750-2500 токенов</div>
+                    <button class="btn-outline" onclick="claimLoot()">Лутануть</button>
+                </div>
+                <div style="font-size: 12px; color: #888; margin-top: 8px;" id="loot-timer">Готов к луту!</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">🎮 Игры казино</div>
+                <div class="game-grid">
+                    <div class="game-card" onclick="openGameModal('roulette')"><div class="game-emoji">🎡</div><div class="game-name">Рулетка</div></div>
+                    <div class="game-card" onclick="openGameModal('crash')"><div class="game-emoji">💥</div><div class="game-name">Краш</div></div>
+                    <div class="game-card" onclick="openGameModal('coin')"><div class="game-emoji">🪙</div><div class="game-name">Орёл/Решка</div></div>
+                    <div class="game-card" onclick="openGameModal('dream')"><div class="game-emoji">🪄</div><div class="game-name">DreamCatcher</div></div>
+                    <div class="game-card" onclick="openGameModal('rps')"><div class="game-emoji">🗿</div><div class="game-name">КНБ</div></div>
+                    <div class="game-card" onclick="openGameModal('duel')"><div class="game-emoji">🤠</div><div class="game-name">Дуэль</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-profile" class="page">
+            <div class="card">
+                <div class="card-header">👤 Профиль</div>
+                <div><strong>ID:</strong> <span id="user-id">-</span></div>
+                <div><strong>💰 Токены:</strong> <span id="profile-tokens">0</span></div>
+                <div><strong>✨ Аура:</strong> <span id="profile-aura">0</span></div>
+                <div><strong>👍 Репутация:</strong> <span id="reputation">0</span></div>
+                <div><strong>📊 Ставок:</strong> <span id="total-bets">0</span></div>
+                <div><strong>🏆 Побед:</strong> <span id="total-wins">0</span></div>
+                <hr style="margin: 15px 0; border-color: rgba(0,243,255,0.2);">
+                <button class="btn" onclick="buyPremium()">💎 Купить Premium (50 XTR)</button>
+            </div>
+        </div>
+
+        <div id="page-stats" class="page">
+            <div class="card">
+                <div class="card-header">🏆 Топ игроков</div>
+                <div id="top-players">Загрузка...</div>
+            </div>
+            <div class="card">
+                <div class="card-header">📊 Моя статистика</div>
+                <div><strong>📈 Уровень:</strong> <span id="level">1</span></div>
+                <div><strong>🏆 Побед:</strong> <span id="stats-wins">0</span></div>
+                <div><strong>📊 Процент побед:</strong> <span id="win-rate">0</span>%</div>
+            </div>
+        </div>
+
+        <div class="nav">
+            <div class="nav-item active" data-page="dashboard"><div class="nav-emoji">🏠</div><div class="nav-label">Главная</div></div>
+            <div class="nav-item" data-page="profile"><div class="nav-emoji">👤</div><div class="nav-label">Профиль</div></div>
+            <div class="nav-item" data-page="stats"><div class="nav-emoji">📊</div><div class="nav-label">Статистика</div></div>
+        </div>
+    </div>
+
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><span id="modal-title">Игра</span><button class="close-btn" onclick="closeModal()">×</button></div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        const user = tg.initDataUnsafe?.user || { id: 0, first_name: "Гость" };
+        document.getElementById("username").innerText = user.first_name || "Игрок";
+        document.getElementById("user-id").innerText = user.id;
+        
+        // КЛЮЧ ДЛЯ ХРАНЕНИЯ В localStorage
+        const STORAGE_KEY = `glb_user_${user.id}`;
+        
+        // Функция загрузки данных из localStorage
+        function loadUserData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    userData = {
+                        tokens: data.tokens || 1250,
+                        aura: data.aura || 2500,
+                        reputation: data.reputation || 0,
+                        level: data.level || 1,
+                        total_bets: data.total_bets || 0,
+                        total_wins: data.total_wins || 0,
+                        lastLootTime: data.lastLootTime || null,
+                        lastBonusDate: data.lastBonusDate || null,
+                        bonusStreak: data.bonusStreak || 1
+                    };
+                    
+                    // Восстанавливаем таймер лута
+                    if (userData.lastLootTime) {
+                        const lastLoot = new Date(userData.lastLootTime);
+                        const now = new Date();
+                        const hoursPassed = (now - lastLoot) / (1000 * 60 * 60);
+                        if (hoursPassed < 1.5) {
+                            lootAvailable = false;
+                            const remaining = (1.5 - hoursPassed) * 3600000;
+                            startLootTimer(remaining);
+                        } else {
+                            lootAvailable = true;
+                            document.getElementById("loot-timer").innerHTML = "✅ Готов к луту!";
+                        }
+                    }
+                    
+                    // Восстанавливаем ежедневный бонус
+                    if (userData.lastBonusDate) {
+                        const lastBonus = new Date(userData.lastBonusDate);
+                        const now = new Date();
+                        const daysPassed = (now - lastBonus) / (1000 * 60 * 60 * 24);
+                        if (daysPassed < 1) {
+                            dailyBonus.available = false;
+                            const remaining = (1 - daysPassed) * 86400000;
+                            startBonusTimer(remaining);
+                        } else if (daysPassed >= 1 && daysPassed < 2) {
+                            dailyBonus.available = true;
+                            dailyBonus.streak = userData.bonusStreak || 1;
+                        } else {
+                            dailyBonus.available = true;
+                            dailyBonus.streak = 1;
+                        }
+                        document.getElementById("streak-day").innerText = dailyBonus.streak;
+                    }
+                    
+                    updateUI();
+                    return true;
+                } catch(e) {
+                    console.log("Ошибка загрузки:", e);
+                }
+            }
+            return false;
+        }
+        
+        // Функция сохранения данных в localStorage
+        function saveUserData() {
+            const toSave = {
+                tokens: userData.tokens,
+                aura: userData.aura,
+                reputation: userData.reputation,
+                level: userData.level,
+                total_bets: userData.total_bets,
+                total_wins: userData.total_wins,
+                lastLootTime: userData.lastLootTime,
+                lastBonusDate: userData.lastBonusDate,
+                bonusStreak: dailyBonus.streak
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+        }
+        
+        let userData = { tokens: 1250, aura: 2500, reputation: 0, level: 1, total_bets: 0, total_wins: 0, lastLootTime: null, lastBonusDate: null };
+        let lootAvailable = true;
+        let lootTimerInterval = null;
+        let dailyBonus = { streak: 1, available: true };
+        let bonusTimerInterval = null;
+        
+        function startLootTimer(duration) {
+            if (lootTimerInterval) clearInterval(lootTimerInterval);
+            const endTime = Date.now() + duration;
+            lootTimerInterval = setInterval(() => {
+                const remaining = endTime - Date.now();
+                if (remaining <= 0) {
+                    clearInterval(lootTimerInterval);
+                    lootAvailable = true;
+                    document.getElementById("loot-timer").innerHTML = "✅ Готов к луту!";
+                } else {
+                    const hours = Math.floor(remaining / 3600000);
+                    const minutes = Math.floor((remaining % 3600000) / 60000);
+                    document.getElementById("loot-timer").innerHTML = `⏳ ${hours}ч ${minutes}м`;
+                }
+            }, 1000);
+        }
+        
+        function startBonusTimer(duration) {
+            if (bonusTimerInterval) clearInterval(bonusTimerInterval);
+            const endTime = Date.now() + duration;
+            bonusTimerInterval = setInterval(() => {
+                const remaining = endTime - Date.now();
+                if (remaining <= 0) {
+                    clearInterval(bonusTimerInterval);
+                    dailyBonus.available = true;
+                    document.getElementById("bonus-timer").innerHTML = "✅ Готов!";
+                } else {
+                    const hours = Math.floor(remaining / 3600000);
+                    const minutes = Math.floor((remaining % 3600000) / 60000);
+                    document.getElementById("bonus-timer").innerHTML = `⏳ ${hours}ч ${minutes}м`;
+                }
+            }, 1000);
+        }
+        
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById("toast");
+            toast.style.backgroundColor = isError ? "#ff4757" : "#00f3ff";
+            toast.style.color = isError ? "white" : "black";
+            toast.innerText = msg;
+            toast.style.display = "block";
+            setTimeout(() => { toast.style.display = "none"; }, 3000);
+        }
+        
+        function updateUI() {
+            document.getElementById("tokens").innerText = userData.tokens.toLocaleString();
+            document.getElementById("aura").innerText = userData.aura.toLocaleString();
+            document.getElementById("profile-tokens").innerText = userData.tokens.toLocaleString();
+            document.getElementById("profile-aura").innerText = userData.aura.toLocaleString();
+            document.getElementById("reputation").innerText = userData.reputation;
+            document.getElementById("total-bets").innerText = userData.total_bets;
+            document.getElementById("total-wins").innerText = userData.total_wins;
+            document.getElementById("stats-wins").innerText = userData.total_wins;
+            let winRate = userData.total_bets > 0 ? Math.round(userData.total_wins / userData.total_bets * 100) : 0;
+            document.getElementById("win-rate").innerText = winRate;
+            
+            let rankName = "Водолаз", percent = 0;
+            if (userData.aura >= 20001) { rankName = "Пахан"; percent = Math.min(100, (userData.aura - 20001) / 29999 * 100); }
+            else if (userData.aura >= 10001) { rankName = "Авторитет"; percent = Math.min(100, (userData.aura - 10001) / 9999 * 100); }
+            else if (userData.aura >= 5001) { rankName = "Хлопчик"; percent = Math.min(100, (userData.aura - 5001) / 4999 * 100); }
+            else { percent = Math.min(100, userData.aura / 5000 * 100); }
+            
+            document.getElementById("rank-name").innerText = rankName;
+            document.getElementById("rank-badge").innerText = rankName;
+            document.getElementById("rank-progress").style.width = percent + "%";
+            document.getElementById("rank-next").innerHTML = `До следующего ранга: ${Math.max(0, 5000 - userData.aura)} ауры`;
+        }
+        
+        function claimLoot() {
+            if (!lootAvailable) { showToast("⏳ Лут ещё не готов!", true); return; }
+            let tokens = Math.floor(Math.random() * (2500 - 750 + 1) + 750);
+            let aura = Math.floor(Math.random() * 100 + 1) * 5;
+            userData.tokens += tokens;
+            userData.aura += aura;
+            userData.lastLootTime = new Date().toISOString();
+            updateUI();
+            saveUserData();
+            showToast(`🎉 +${tokens.toLocaleString()}💰 +${aura}✨`);
+            lootAvailable = false;
+            startLootTimer(5400000);
+        }
+        
+        function claimDailyBonus() {
+            if (!dailyBonus.available) { showToast("⏳ Бонус уже получен!", true); return; }
+            let tokens = 500 + (dailyBonus.streak - 1) * 75;
+            let aura = dailyBonus.streak === 7 ? 200 : 0;
+            userData.tokens += tokens;
+            if (aura > 0) userData.aura += aura;
+            userData.lastBonusDate = new Date().toISOString();
+            updateUI();
+            saveUserData();
+            showToast(`🎁 День ${dailyBonus.streak}! +${tokens}💰` + (aura > 0 ? ` +${aura}✨` : ""));
+            dailyBonus.available = false;
+            startBonusTimer(86400000);
+            dailyBonus.streak = dailyBonus.streak >= 7 ? 1 : dailyBonus.streak + 1;
+            document.getElementById("streak-day").innerText = dailyBonus.streak;
+        }
+        
+        function openGameModal(game) {
+            const modal = document.getElementById("gameModal");
+            const title = document.getElementById("modal-title");
+            const body = document.getElementById("modal-body");
+            const games = {
+                roulette: { title: "🎡 Рулетка", html: `<input type="number" id="bet-amount" placeholder="Сумма" value="100"><input type="text" id="bet-condition" placeholder="Условие (красный, ч, 1-12, число)"><button class="btn" onclick="makeBet('roulette')">Сделать ставку</button>` },
+                crash: { title: "💥 Краш", html: `<input type="number" id="bet-amount" placeholder="Сумма" value="100"><input type="text" id="bet-condition" placeholder="Множители 2.5 3.0"><button class="btn" onclick="makeBet('crash')">Сделать ставку</button>` },
+                coin: { title: "🪙 Орёл/Решка", html: `<input type="number" id="bet-amount" placeholder="Сумма" value="100"><select id="bet-condition"><option value="орел">Орёл (x2)</option><option value="решка">Решка (x2)</option><option value="ребро">Ребро (x25)</option></select><button class="btn" onclick="makeBet('coin')">Сделать ставку</button>` },
+                dream: { title: "🪄 DreamCatcher", html: `<input type="number" id="bet-amount" placeholder="Сумма" value="100"><select id="bet-condition"><option value="2">x2</option><option value="3">x3</option><option value="5">x5</option><option value="10">x10</option><option value="20">x20</option><option value="40">x40</option></select><button class="btn" onclick="makeBet('dream')">Сделать ставку</button>` },
+                rps: { title: "🗿 КНБ", html: `<input type="number" id="bet-amount" placeholder="Сумма" value="100"><select id="bet-condition"><option value="камень">🗿 Камень</option><option value="ножницы">✂️ Ножницы</option><option value="бумага">📄 Бумага</option></select><button class="btn" onclick="makeBet('rps')">Играть</button>` },
+                duel: { title: "🤠 Дуэль", html: `<input type="number" id="bet-amount" placeholder="Сумма" value="100"><button class="btn" onclick="makeBet('duel')">Найти противника</button>` }
+            };
+            const g = games[game];
+            title.innerText = g.title;
+            body.innerHTML = g.html;
+            modal.style.display = "flex";
+        }
+        
+        function closeModal() { document.getElementById("gameModal").style.display = "none"; }
+        
+        function makeBet(game) {
+            let bet = parseInt(document.getElementById("bet-amount")?.value || 0);
+            if (bet <= 0 || bet > userData.tokens) { showToast("❌ Недостаточно средств!", true); return; }
+            userData.tokens -= bet;
+            userData.total_bets++;
+            updateUI();
+            saveUserData();
+            closeModal();
+            
+            setTimeout(() => {
+                let win = Math.random() < 0.45;
+                let winAmount = win ? bet * 2 : 0;
+                if (win) {
+                    let tax = Math.floor(winAmount * 0.05);
+                    let afterTax = winAmount - tax;
+                    userData.tokens += afterTax;
+                    userData.total_wins++;
+                    updateUI();
+                    saveUserData();
+                    showToast(`✅ ПОБЕДА! +${afterTax.toLocaleString()}💰 (-${tax}💰 налог)`);
+                } else {
+                    updateUI();
+                    saveUserData();
+                    showToast(`❌ ПРОИГРЫШ! -${bet.toLocaleString()}💰`);
+                }
+            }, 1000);
+        }
+        
+        function buyPremium() { showToast("💎 Premium: /premium в боте"); }
+        
+        function loadTopPlayers() {
+            document.getElementById("top-players").innerHTML = "<div>1. 👑 Главный Надзиратель — ∞</div><div>2. 🏆 Игрок1 — 1,234,567💰</div><div>3. 🏆 Игрок2 — 987,654💰</div>";
+        }
+        
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+                document.getElementById(`page-${item.dataset.page}`).classList.add('active-page');
+                if (item.dataset.page === 'stats') loadTopPlayers();
+            });
+        });
+        
+        // Загружаем сохранённые данные
+        loadUserData();
+        updateUI();
+        loadTopPlayers();
+        tg.ready();
+    </script>
+</body>
+</html>
+  
