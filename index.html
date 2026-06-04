@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GLB RPG Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a1628 0%, #061020 100%);
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(2880deg); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .online-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 180, 255, 0.2);
+            border: 1px solid #00b4ff;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 10px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .admin-panel {
+            position: fixed;
+            bottom: 80px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 16px;
+            padding: 10px;
+            z-index: 100;
+            font-size: 10px;
+        }
+
+        .admin-btn {
+            background: rgba(255, 0, 0, 0.3);
+            border: 1px solid red;
+            border-radius: 8px;
+            padding: 4px 8px;
+            margin: 2px;
+            cursor: pointer;
+        }
+
+        .main-screen {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .card {
+            background: rgba(20, 30, 50, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0, 180, 255, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00b4ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00b4ff;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00b4ff, #0088cc);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #00b4ff;
+            color: #00b4ff;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .game-card {
+            background: rgba(0, 180, 255, 0.1);
+            border: 1px solid rgba(0, 180, 255, 0.3);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .game-card:active {
+            transform: scale(0.96);
+            background: rgba(0, 180, 255, 0.2);
+        }
+
+        .game-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .game-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .rank-progress {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .rank-progress-fill {
+            background: linear-gradient(90deg, #00b4ff, #0088cc);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 20, 35, 0.98);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            border-top: 1px solid rgba(0, 180, 255, 0.3);
+        }
+
+        .nav-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: rgba(0, 180, 255, 0.2);
+        }
+
+        .nav-emoji {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: rgba(0, 180, 255, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+        }
+
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .game-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #0a1628, #061020);
+            border-bottom: 1px solid rgba(0, 180, 255, 0.3);
+        }
+
+        .game-modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00b4ff;
+        }
+
+        .game-modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #00b4ff;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+
+        .game-panel {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .amount-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 180, 255, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #00b4ff, #0088cc);
+            border: none;
+            border-radius: 16px;
+            padding: 14px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            width: calc(100% - 40px);
+            margin: 10px 20px;
+        }
+
+        .result-area {
+            padding: 15px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            margin: 10px;
+            border-radius: 16px;
+            font-size: 14px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 180, 255, 0.95);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 2100;
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        .referral-card {
+            background: rgba(0, 180, 255, 0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .referral-link {
+            background: #0a1628;
+            border: 1px solid #00b4ff;
+            border-radius: 12px;
+            padding: 10px;
+            font-size: 12px;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+
+        .premium-btn {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+        }
+
+        .mining-card {
+            background: linear-gradient(135deg, rgba(0, 180, 255, 0.15), rgba(0, 0, 0, 0.5));
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .mining-btc {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+
+        .mining-status {
+            font-size: 14px;
+            color: #aaa;
+            margin: 10px 0;
+        }
+
+        .nick-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00b4ff;
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .clan-card {
+            background: rgba(0, 180, 255, 0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .effect-badge {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="online-status"><div class="online-dot"></div><span id="onlineCount">1</span> онлайн</div>
+    <div id="adminPanel" class="admin-panel" style="display: none;">
+        <div class="admin-btn" onclick="adminGiveTokens()">➕ Выдать токены</div>
+        <div class="admin-btn" onclick="adminGivePremium()">💎 Выдать премиум</div>
+        <div class="admin-btn" onclick="adminClearData()">🗑️ Очистить данные</div>
+    </div>
+
+    <div id="app">
+        <div id="page-dashboard" class="page active-page">
+            <div class="main-screen">
+                <div class="card">
+                    <div class="card-header">
+                        <span>👋 Привет, <span id="username">Игрок</span></span>
+                        <span class="badge" id="rank-badge">Водолаз</span>
+                        <span class="badge premium-badge" id="premiumBadge" style="display: none;">💎 PREMIUM</span>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item"><div class="stat-label">💰 Токены</div><div class="stat-value" id="tokens">0</div></div>
+                        <div class="stat-item"><div class="stat-label">✨ Аура</div><div class="stat-value" id="aura">0</div></div>
+                    </div>
+                    <div><div style="font-size: 14px; margin-bottom: 5px;">⭐ Ранг: <span id="rank-name">Водолаз</span></div>
+                    <div class="rank-progress"><div class="rank-progress-fill" id="rank-progress" style="width: 0%"></div></div>
+                    <div style="font-size: 12px; color: #aaa;" id="rank-next">До следующего ранга: 5000 ауры</div></div>
+                    <div style="margin-top: 10px;"><div class="effect-badge" id="cashbackEffect" style="display: none;">💸 Кэшбэк активен</div>
+                    <div class="effect-badge" id="cheatEffect" style="display: none;">🎮 Читы активны</div></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">⛏️ Майнинг ферма</div>
+                    <div class="mining-card">
+                        <div>🪙 Накоплено BTC</div>
+                        <div class="mining-btc" id="btcAmount">0</div>
+                        <div>💰 Стоимость: <span id="btcValue">0</span>💰</div>
+                        <div class="mining-status" id="miningStatus">Нет активной фермы</div>
+                        <button class="btn" id="buyFarmBtn" onclick="buyFarm()">💰 Купить ферму (4 500 000💰)</button>
+                        <button class="btn-outline" id="extendFarmBtn" onclick="extendFarm()" style="display: none;">⏰ Продлить ферму</button>
+                        <button class="btn-outline" id="sellBtcBtn" onclick="sellBtc()" style="display: none;">💰 Продать BTC</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">🎁 Ежедневный бонус</div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>📅 День <span id="streak-day">1</span>/7</div>
+                        <button class="btn-outline" onclick="claimDailyBonus()">Забрать</button>
+                    </div>
+                    <div style="font-size: 12px; color: #aaa; margin-top: 8px;" id="bonus-timer">Доступно сейчас!</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">⏱️ Лут</div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>🎲 Награда: 750-2500 токенов</div>
+                        <button class="btn-outline" onclick="claimLoot()">Лутануть</button>
+                    </div>
+                    <div style="font-size: 12px; color: #aaa; margin-top: 8px;" id="loot-timer">Готов к луту!</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">👤 Управление</div>
+                    <input type="text" id="nicknameInput" class="nick-input" placeholder="Новый никнейм (макс 32 символа)">
+                    <button class="btn-outline" onclick="changeNickname()">✏️ Сменить ник (500💰)</button>
+                    <button class="btn premium-btn" onclick="buyPremiumStars()">⭐ Купить Premium (20 Telegram Stars)</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">💰 Финансы</div>
+                    <button class="btn" onclick="showTransfer()">💸 Перевод токенов</button>
+                    <button class="btn-outline" onclick="showTop()">🏆 Топ игроков</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">👥 Реферальная система</div>
+                    <button class="btn" onclick="showReferral()">🔗 Моя реферальная ссылка</button>
+                    <div id="referralInfo"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-profile" class="page">
+            <div class="main-screen">
+                <div class="card">
+                    <div class="card-header">👤 Профиль</div>
+                    <div><strong>🆔 ID:</strong> <span id="user-id">-</span></div>
+                    <div><strong>👤 Никнейм:</strong> <span id="profile-nickname">-</span></div>
+                    <div><strong>💰 Токены:</strong> <span id="profile-tokens">0</span></div>
+                    <div><strong>✨ Аура:</strong> <span id="profile-aura">0</span></div>
+                    <div><strong>👍 Репутация:</strong> <span id="reputation">0</span></div>
+                    <div><strong>📊 Ставок:</strong> <span id="total-bets">0</span></div>
+                    <div><strong>🏆 Побед:</strong> <span id="total-wins">0</span></div>
+                    <div><strong>📈 Уровень:</strong> <span id="level">1</span></div>
+                    <div><strong>💎 Premium:</strong> <span id="profile-premium">Нет</span></div>
+                    <div><strong>👥 Приглашено:</strong> <span id="referralCount">0</span></div>
+                    <div><strong>🎁 Бонус за рефералов:</strong> <span id="referralBonus">0</span>💰</div>
+                    <div><strong>🏠 Клан:</strong> <span id="profile-clan">Нет</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">🎒 Инвентарь</div>
+                    <div id="inventoryList">Загрузка...</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-clan" class="page">
+            <div class="main-screen">
+                <div class="card">
+                    <div class="card-header">🏴‍☠️ Клан</div>
+                    <input type="text" id="clanNameInput" class="nick-input" placeholder="Название клана">
+                    <button class="btn" onclick="createClan()">Создать клан</button>
+                    <input type="text" id="clanIdInput" class="nick-input" placeholder="ID клана">
+                    <button class="btn-outline" onclick="joinClan()">Вступить в клан</button>
+                    <button class="btn-outline" onclick="leaveClan()">Покинуть клан</button>
+                    <button class="btn-outline" onclick="clanBonus()">🎁 Клан бонус (раз в 35 мин)</button>
+                    <div id="clanInfo" class="clan-card" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-commands" class="page">
+            <div class="main-screen">
+                <div class="card">
+                    <div class="card-header">📋 Доступные команды</div>
+                    <div style="font-size: 13px;">
+                        <b>💰 Экономика:</b><br>
+                        • лут - получить награду<br>
+                        • баланс - проверить баланс<br>
+                        • перевод [сумма] (ответом)<br>
+                        • инвентарь - посмотреть предметы<br><br>
+                        <b>⚡ Эффекты:</b><br>
+                        • /cashback - активировать кэшбэк (45%)<br>
+                        • /skip - сбросить все кулдауны<br>
+                        • /cheat - активировать читы (нельзя проиграть)<br><br>
+                        <b>👥 Социальное:</b><br>
+                        • +реп/-реп (ответом)<br>
+                        • создать клан [название]<br>
+                        • вступить клан [ID]<br>
+                        • покинуть клан<br>
+                        • клан бонус<br><br>
+                        <b>🛠️ Админ (для надзирателей):</b><br>
+                        • мут/бан/размут/разбан (ответом)<br>
+                        • give [токены/ауру] [сумма] (ответом)<br>
+                        • take [токены/ауру] [сумма] (ответом)<br>
+                        • вознесись/павший - админ<br>
+                        • божество/смертный - надзиратель<br>
+                        • /ивент старт - запуск Кракена<br>
+                        • /датьпредмет [предмет] [кол-во] (ответом)<br>
+                        • /создать_аукцион [предмет] [кол-во]<br>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav">
+            <div class="nav-item active" data-page="dashboard"><div class="nav-emoji">🏠</div><div class="nav-label">Главная</div></div>
+            <div class="nav-item" data-page="profile"><div class="nav-emoji">👤</div><div class="nav-label">Профиль</div></div>
+            <div class="nav-item" data-page="clan"><div class="nav-emoji">🏴‍☠️</div><div class="nav-label">Клан</div></div>
+            <div class="nav-item" data-page="commands"><div class="nav-emoji">📋</div><div class="nav-label">Команды</div></div>
+        </div>
+    </div>
+
+    <div id="transferModal" class="game-modal">
+        <div class="game-modal-header"><span class="game-modal-title">💸 Перевод токенов</span><button class="game-modal-close" onclick="closeTransferModal()">✕</button></div>
+        <div style="padding: 20px;">
+            <input type="text" id="transferUserId" class="amount-input" placeholder="ID получателя" style="margin-bottom: 10px;" inputmode="numeric">
+            <input type="number" id="transferAmount" class="amount-input" placeholder="Сумма" style="margin-bottom: 20px;" inputmode="numeric">
+            <button class="submit-btn" onclick="sendTransfer()">Отправить</button>
+        </div>
+    </div>
+
+    <div id="referralModal" class="game-modal">
+        <div class="game-modal-header"><span class="game-modal-title">🔗 Реферальная ссылка</span><button class="game-modal-close" onclick="closeReferralModal()">✕</button></div>
+        <div style="padding: 20px;">
+            <div class="referral-card">
+                <div>👥 Ваша реферальная ссылка:</div>
+                <div class="referral-link" id="referralLink"></div>
+                <div style="margin-top: 15px;">🎁 За каждого приглашённого друга вы получаете <b>500💰</b>!</div>
+                <div style="margin-top: 10px; font-size: 12px; color: #aaa;">📊 Ваш бонус: <span id="refBonus">0</span>💰</div>
+                <button class="btn" onclick="copyReferralLink()" style="margin-top: 15px;">📋 Копировать ссылку</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="topModal" class="game-modal">
+        <div class="game-modal-header"><span class="game-modal-title">🏆 Топ игроков</span><button class="game-modal-close" onclick="closeTopModal()">✕</button></div>
+        <div style="padding: 20px;" id="topPlayersList"></div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+        
+        const user = tg.initDataUnsafe?.user || { id: Math.floor(Math.random() * 1000000), first_name: "Гость" };
+        const ADMIN_ID = 6156828092;
+        const isAdmin = (user.id == ADMIN_ID);
+        
+        document.getElementById("username").innerText = user.first_name || "Игрок";
+        document.getElementById("user-id").innerText = user.id;
+        if (isAdmin) document.getElementById("adminPanel").style.display = "block";
+        
+        const STORAGE_KEY = `glb_user_${user.id}`;
+        const REFERRALS_KEY = "glb_referrals";
+        const CLANS_KEY = "glb_clans";
+        
+        let userData = {
+            tokens: 1250, aura: 2500, reputation: 0, total_bets: 0, total_wins: 0,
+            lastLootTime: null, lastBonusDate: null, isPremium: false,
+            nickname: null, clan_id: null, referralCode: null, referrals: [], referralBonus: 0,
+            inventory: { cashback: 0, skip: 0, cheat: 0, antimatter: 0, discount_card: 0 },
+            activeEffects: {},
+            mining: { active: false, bitcoins: 0, expires_at: null, last_update: null },
+            level_points: 0
+        };
+        
+        let dailyBonus = { streak: 1, available: true };
+        let lootAvailable = true;
+        let lootTimerInterval = null;
+        let bonusTimerInterval = null;
+        
+        // Загрузка данных
+        function loadUserData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    userData = {
+                        tokens: data.tokens ?? 1250, aura: data.aura ?? 2500,
+                        reputation: data.reputation ?? 0, total_bets: data.total_bets ?? 0,
+                        total_wins: data.total_wins ?? 0, lastLootTime: data.lastLootTime ?? null,
+                        lastBonusDate: data.lastBonusDate ?? null, isPremium: data.isPremium ?? false,
+                        nickname: data.nickname ?? null, clan_id: data.clan_id ?? null,
+                        referralCode: data.referralCode, referrals: data.referrals ?? [],
+                        referralBonus: data.referralBonus ?? 0,
+                        inventory: data.inventory ?? { cashback: 0, skip: 0, cheat: 0, antimatter: 0, discount_card: 0 },
+                        activeEffects: data.activeEffects ?? {},
+                        mining: data.mining ?? { active: false, bitcoins: 0, expires_at: null, last_update: null },
+                        level_points: data.level_points ?? 0
+                    };
+                    dailyBonus.streak = data.bonusStreak ?? 1;
+                    if (userData.mining?.expires_at && new Date(userData.mining.expires_at) > new Date()) {
+                        updateMiningBTC();
+                    }
+                } catch(e) {}
+            }
+            initReferral();
+            if (userData.isPremium) {
+                document.getElementById("premiumBadge").style.display = "inline-block";
+                document.getElementById("profile-premium").innerText = "Да";
+            }
+            if (userData.nickname) {
+                document.getElementById("username").innerText = userData.nickname;
+            }
+            updateUI();
+            updateMiningUI();
+            updateInventoryUI();
+            updateClanUI();
+            checkActiveEffects();
+            startTimers();
+        }
+        
+        function saveUserData() {
+            const toSave = {
+                tokens: userData.tokens, aura: userData.aura, reputation: userData.reputation,
+                total_bets: userData.total_bets, total_wins: userData.total_wins,
+                lastLootTime: userData.lastLootTime, lastBonusDate: userData.lastBonusDate,
+                bonusStreak: dailyBonus.streak, isPremium: userData.isPremium,
+                nickname: userData.nickname, clan_id: userData.clan_id,
+                referralCode: userData.referralCode, referrals: userData.referrals,
+                referralBonus: userData.referralBonus, inventory: userData.inventory,
+                activeEffects: userData.activeEffects, mining: userData.mining,
+                level_points: userData.level_points
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+        }
+        
+        // Майнинг
+        function updateMiningBTC() {
+            if (!userData.mining.active) return;
+            const now = new Date();
+            const expires = new Date(userData.mining.expires_at);
+            if (now > expires) {
+                userData.mining.active = false;
+                updateMiningUI();
+                saveUserData();
+                return;
+            }
+            const lastUpdate = userData.mining.last_update ? new Date(userData.mining.last_update) : now;
+            const minutesPassed = Math.floor((now - lastUpdate) / 60000);
+            if (minutesPassed > 0 && userData.mining.active) {
+                userData.mining.bitcoins += minutesPassed;
+                userData.mining.last_update = now.toISOString();
+                saveUserData();
+            }
+            setTimeout(() => updateMiningBTC(), 60000);
+        }
+        
+        function updateMiningUI() {
+            const btcValue = userData.mining.bitcoins * 3000;
+            document.getElementById("btcAmount").innerText = userData.mining.bitcoins.toLocaleString();
+            document.getElementById("btcValue").innerText = btcValue.toLocaleString();
+            
+            if (userData.mining.active && userData.mining.expires_at) {
+                const expires = new Date(userData.mining.expires_at);
+                const now = new Date();
+                if (expires > now) {
+                    const hours = Math.floor((expires - now) / 3600000);
+                    const minutes = Math.floor(((expires - now) % 3600000) / 60000);
+                    document.getElementById("miningStatus").innerHTML = `⛏️ Ферма работает! Осталось: ${hours}ч ${minutes}м<br>⚡ 1 BTC/минуту`;
+                    document.getElementById("buyFarmBtn").style.display = "none";
+                    document.getElementById("extendFarmBtn").style.display = "inline-block";
+                    document.getElementById("sellBtcBtn").style.display = "inline-block";
+                    return;
+                }
+            }
+            document.getElementById("miningStatus").innerHTML = "⛏️ Нет активной фермы";
+            document.getElementById("buyFarmBtn").style.display = "block";
+            document.getElementById("extendFarmBtn").style.display = "none";
+            document.getElementById("sellBtcBtn").style.display = userData.mining.bitcoins > 0 ? "inline-block" : "none";
+        }
+        
+        function buyFarm() {
+            const cost = 4500000;
+            if (userData.tokens < cost) {
+                showToast(`❌ Не хватает ${cost.toLocaleString()}💰!`, true);
+                return;
+            }
+            userData.tokens -= cost;
+            userData.mining = {
+                active: true,
+                bitcoins: 0,
+                expires_at: new Date(Date.now() + 7200000).toISOString(),
+                last_update: new Date().toISOString()
+            };
+            saveUserData();
+            updateUI();
+            updateMiningUI();
+            showToast("✅ Ферма куплена! Начинаем майнинг!", false);
+        }
+        
+        function extendFarm() {
+            if (userData.mining.active) {
+                const newExpires = new Date(Math.max(Date.now(), new Date(userData.mining.expires_at).getTime()) + 7200000);
+                userData.mining.expires_at = newExpires.toISOString();
+                saveUserData();
+                updateMiningUI();
+                showToast("✅ Ферма продлена на 2 часа!", false);
+            }
+        }
+        
+        function sellBtc() {
+            if (userData.mining.bitcoins <= 0) {
+                showToast("❌ Нет BTC для продажи!", true);
+                return;
+            }
+            const tokens = userData.mining.bitcoins * 3000;
+            userData.tokens += tokens;
+            userData.mining.bitcoins = 0;
+            saveUserData();
+            updateUI();
+            updateMiningUI();
+            showToast(`💰 Продано! +${tokens.toLocaleString()}💰`, false);
+        }
+        
+        // Эффекты
+        function checkActiveEffects() {
+            const now = new Date();
+            if (userData.activeEffects.cashback && new Date(userData.activeEffects.cashback) > now) {
+                document.getElementById("cashbackEffect").style.display = "inline-block";
+            } else {
+                document.getElementById("cashbackEffect").style.display = "none";
+                delete userData.activeEffects.cashback;
+            }
+            if (userData.activeEffects.cheat && new Date(userData.activeEffects.cheat) > now) {
+                document.getElementById("cheatEffect").style.display = "inline-block";
+            } else {
+                document.getElementById("cheatEffect").style.display = "none";
+                delete userData.activeEffects.cheat;
+            }
+            saveUserData();
+            setTimeout(() => checkActiveEffects(), 60000);
+        }
+        
+        // Инвентарь
+        function updateInventoryUI() {
+            const inv = userData.inventory;
+            const html = `
+                <div>💸 Кэшбэк: ${inv.cashback || 0} шт. (команда: /cashback)</div>
+                <div>⏩ Скип: ${inv.skip || 0} шт. (команда: /skip)</div>
+                <div>🎮 Читы: ${inv.cheat || 0} шт. (команда: /cheat)</div>
+                <div>⚛️ Анти-Материя: ${inv.antimatter || 0} шт.</div>
+                <div>💳 Скидочная карточка: ${inv.discount_card || 0} шт.</div>
+            `;
+            document.getElementById("inventoryList").innerHTML = html;
+        }
+        
+        // Никнейм
+        function changeNickname() {
+            const newNick = document.getElementById("nicknameInput").value.trim();
+            if (!newNick) { showToast("❌ Введите никнейм!", true); return; }
+            if (newNick.length > 32) { showToast("❌ Максимум 32 символа!", true); return; }
+            if (userData.tokens < 500 && !userData.isPremium && user.id != ADMIN_ID) {
+                showToast("❌ Нужно 500💰 для смены ника!", true);
+                return;
+            }
+            if (!userData.isPremium && user.id != ADMIN_ID) {
+                userData.tokens -= 500;
+            }
+            userData.nickname = newNick;
+            document.getElementById("username").innerText = newNick;
+            document.getElementById("profile-nickname").innerText = newNick;
+            saveUserData();
+            updateUI();
+            showToast(`✅ Никнейм изменён на: ${newNick}`, false);
+        }
+        
+        // Кланы
+        function saveClans(clans) { localStorage.setItem(CLANS_KEY, JSON.stringify(clans)); }
+        function loadClans() { return JSON.parse(localStorage.getItem(CLANS_KEY) || "{}"); }
+        
+        function createClan() {
+            const name = document.getElementById("clanNameInput").value.trim();
+            if (!name) { showToast("❌ Введите название клана!", true); return; }
+            if (name.length > 30) { showToast("❌ Название не длиннее 30 символов!", true); return; }
+            if (userData.clan_id) { showToast("❌ Вы уже в клане!", true); return; }
+            const clans = loadClans();
+            const clanId = Math.floor(Math.random() * 90000 + 10000).toString();
+            clans[clanId] = { name: name, leader: user.id, members: [user.id], created: new Date().toISOString() };
+            saveClans(clans);
+            userData.clan_id = clanId;
+            saveUserData();
+            updateClanUI();
+            showToast(`✅ Клан "${name}" создан! ID: ${clanId}`, false);
+        }
+        
+        function joinClan() {
+            const clanId = document.getElementById("clanIdInput").value.trim();
+            if (!clanId) { showToast("❌ Введите ID клана!", true); return; }
+            if (userData.clan_id) { showToast("❌ Вы уже в клане!", true); return; }
+            const clans = loadClans();
+            if (!clans[clanId]) { showToast("❌ Клан не найден!", true); return; }
+            if (clans[clanId].members.length >= 15) { showToast("❌ Клан переполнен!", true); return; }
+            clans[clanId].members.push(user.id);
+            saveClans(clans);
+            userData.clan_id = clanId;
+            saveUserData();
+            updateClanUI();
+            showToast(`✅ Вы вступили в клан "${clans[clanId].name}"`, false);
+        }
+        
+        function leaveClan() {
+            if (!userData.clan_id) { showToast("❌ Вы не в клане!", true); return; }
+            if (confirm("Вы уверены, что хотите покинуть клан?")) {
+                const clans = loadClans();
+                if (clans[userData.clan_id]) {
+                    clans[userData.clan_id].members = clans[userData.clan_id].members.filter(id => id != user.id);
+                    if (clans[userData.clan_id].members.length === 0) {
+                        delete clans[userData.clan_id];
+                    }
+                    saveClans(clans);
+                }
+                userData.clan_id = null;
+                saveUserData();
+                updateClanUI();
+                showToast("✅ Вы покинули клан!", false);
+            }
+        }
+        
+        function clanBonus() {
+            if (!userData.clan_id) { showToast("❌ Вы не в клане!", true); return; }
+            const lastBonus = userData.lastClanBonus ? new Date(userData.lastClanBonus) : null;
+            if (lastBonus && (Date.now() - lastBonus) < 2100000) {
+                const remaining = Math.ceil((2100000 - (Date.now() - lastBonus)) / 60000);
+                showToast(`⏳ Бонус доступен через ${remaining} минут`, true);
+                return;
+            }
+            const tokens = Math.floor(Math.random() * 51) + 50;
+            const aura = 25;
+            userData.tokens += tokens;
+            userData.aura += aura;
+            userData.lastClanBonus = new Date().toISOString();
+            saveUserData();
+            updateUI();
+            showToast(`🎁 Клан бонус! +${tokens}💰 +${aura}✨`, false);
+        }
+        
+        function updateClanUI() {
+            if (userData.clan_id) {
+                const clans = loadClans();
+                const clan = clans[userData.clan_id];
+                if (clan) {
+                    document.getElementById("profile-clan").innerHTML = `${clan.name} [${userData.clan_id}]`;
+                    document.getElementById("clanInfo").style.display = "block";
+                    document.getElementById("clanInfo").innerHTML = `
+                        <strong>🏴‍☠️ ${clan.name}</strong><br>
+                        ID: ${userData.clan_id}<br>
+                        👑 Лидер: ${clan.leader == user.id ? "Вы" : clan.leader}<br>
+                        👥 Участников: ${clan.members.length}/15<br>
+                        📅 Создан: ${new Date(clan.created).toLocaleDateString()}
+                    `;
+                    return;
+                }
+            }
+            document.getElementById("profile-clan").innerHTML = "Нет";
+            document.getElementById("clanInfo").style.display = "none";
+        }
+        
+        // Рефералы
+        function initReferral() {
+            let referrals = JSON.parse(localStorage.getItem(REFERRALS_KEY) || "{}");
+            if (!userData.referralCode) {
+                userData.referralCode = user.id.toString(36) + Math.random().toString(36).substr(2, 6);
+            }
+            if (referrals[userData.referralCode]) {
+                userData.referrals = referrals[userData.referralCode].refs || [];
+                userData.referralBonus = referrals[userData.referralCode].bonus || 0;
+            }
+            saveUserData();
+            checkReferralFromURL();
+        }
+        
+        function checkReferralFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('start')?.replace('ref_', '');
+            if (ref && ref !== userData.referralCode) {
+                let referrals = JSON.parse(localStorage.getItem(REFERRALS_KEY) || "{}");
+                if (!referrals[ref]) referrals[ref] = { refs: [], bonus: 0 };
+                if (!referrals[ref].refs.includes(user.id)) {
+                    referrals[ref].refs.push(user.id);
+                    referrals[ref].bonus += 500;
+                    localStorage.setItem(REFERRALS_KEY, JSON.stringify(referrals));
+                    showToast(`🎉 Вы были приглашены! +500💰 бонус`, false);
+                    userData.tokens += 500;
+                    saveUserData();
+                    updateUI();
+                }
+            }
+        }
+        
+        function showReferral() {
+            const botUsername = tg.initDataUnsafe?.user?.username || "GLBBot";
+            document.getElementById("referralLink").innerHTML = `https://t.me/${botUsername}?start=ref_${userData.referralCode}`;
+            document.getElementById("refBonus").innerText = userData.referralBonus.toLocaleString();
+            document.getElementById("referralModal").style.display = "flex";
+        }
+        
+        function closeReferralModal() { document.getElementById("referralModal").style.display = "none"; }
+        function copyReferralLink() {
+            const link = document.getElementById("referralLink").innerText;
+            navigator.clipboard.writeText(link);
+            showToast("✅ Ссылка скопирована!", false);
+        }
+        
+        // Топ игроков
+        function showTop() {
+            const players = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith("glb_user_")) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        players.push({ name: data.nickname || "Игрок", tokens: data.tokens || 0, premium: data.isPremium });
+                    } catch(e) {}
+                }
+            }
+            players.sort((a,b) => b.tokens - a.tokens);
+            let html = '<div class="card"><div class="card-header">🏆 Топ по токенам</div>';
+            players.slice(0, 10).forEach((p, i) => {
+                html += `<div class="leaderboard-item"><span>${i+1}. ${p.premium ? "💎 " : ""}${p.name}</span><span>${p.tokens.toLocaleString()}💰</span></div>`;
+            });
+            html += '</div>';
+            document.getElementById("topPlayersList").innerHTML = html;
+            document.getElementById("topModal").style.display = "flex";
+        }
+        
+        function closeTopModal() { document.getElementById("topModal").style.display = "none"; }
+        
+        // Лут
+        function claimLoot() {
+            if (!lootAvailable) { showToast("⏳ Лут ещё не готов!", true); return; }
+            let tokens = Math.floor(Math.random() * (2500 - 750 + 1) + 750);
+            let aura = Math.floor(Math.random() * 100 + 1) * 5;
+            if (userData.isPremium) { tokens = Math.floor(tokens * 1.5); aura = Math.floor(aura * 1.5); }
+            userData.tokens += tokens;
+            userData.aura += aura;
+            userData.lastLootTime = new Date().toISOString();
+            updateUI();
+            saveUserData();
+            showToast(`🎉 +${tokens.toLocaleString()}💰 +${aura}✨`, false);
+            lootAvailable = false;
+            startLootTimer(userData.isPremium ? 3600000 : 5400000);
+        }
+        
+        // Ежедневный бонус
+        function claimDailyBonus() {
+            if (!dailyBonus.available) { showToast("⏳ Бонус уже получен!", true); return; }
+            let tokens = 500 + (dailyBonus.streak - 1) * 75;
+            let aura = dailyBonus.streak === 7 ? 200 : 0;
+            if (userData.isPremium) { tokens = Math.floor(tokens * 1.5); aura = Math.floor(aura * 1.5); }
+            userData.tokens += tokens;
+            if (aura > 0) userData.aura += aura;
+            userData.lastBonusDate = new Date().toISOString();
+            updateUI();
+            saveUserData();
+            showToast(`🎁 День ${dailyBonus.streak}! +${tokens}💰` + (aura > 0 ? ` +${aura}✨` : ""), false);
+            dailyBonus.available = false;
+            startBonusTimer(86400000);
+            dailyBonus.streak = dailyBonus.streak >= 7 ? 1 : dailyBonus.streak + 1;
+            document.getElementById("streak-day").innerText = dailyBonus.streak;
+        }
+        
+        // Перевод
+        function showTransfer() { document.getElementById("transferModal").style.display = "flex"; }
+        function closeTransferModal() { document.getElementById("transferModal").style.display = "none"; }
+        
+        function sendTransfer() {
+            const targetId = parseInt(document.getElementById("transferUserId").value);
+            const amount = parseInt(document.getElementById("transferAmount").value);
+            if (!targetId || !amount || amount <= 0) { showToast("❌ Введите ID и сумму!", true); return; }
+            if (targetId == user.id) { showToast("❌ Нельзя себе!", true); return; }
+            if (userData.tokens < amount) { showToast(`❌ Не хватает ${amount}💰!`, true); return; }
+            const targetKey = `glb_user_${targetId}`;
+            const targetData = localStorage.getItem(targetKey);
+            if (!targetData) { showToast("❌ Пользователь не найден!", true); return; }
+            let targetUser; try { targetUser = JSON.parse(targetData); } catch(e) { showToast("❌ Ошибка!", true); return; }
+            let tax = userData.isPremium ? 0 : Math.floor(amount * 0.01);
+            let finalAmount = amount - tax;
+            userData.tokens -= amount;
+            targetUser.tokens = (targetUser.tokens || 0) + finalAmount;
+            localStorage.setItem(targetKey, JSON.stringify(targetUser));
+            updateUI();
+            saveUserData();
+            if (tax > 0) {
+                showToast(`💸 Перевод ${finalAmount}💰 выполнен! (-${tax}💰 налог)`, false);
+            } else {
+                showToast(`💸 Перевод ${finalAmount}💰 выполнен!`, false);
+            }
+            closeTransferModal();
+            document.getElementById("transferUserId").value = "";
+            document.getElementById("transferAmount").value = "";
+        }
+        
+        // Premium покупка
+        function buyPremiumStars() {
+            if (userData.isPremium) { showToast("❌ У вас уже есть Premium!", true); return; }
+            tg.sendInvoice({
+                title: "💎 GLB Premium",
+                description: "Premium навсегда: 0% налоги, ускоренный лут (1 час), +50% к бонусам",
+                currency: "XTR",
+                prices: [{ label: "Premium", amount: 20 }],
+                payload: JSON.stringify({ type: "premium", user_id: user.id }),
+                provider_token: ""
+            });
+        }
+        
+        tg.onEvent("paymentSuccess", (event) => {
+            try {
+                const payload = JSON.parse(event.payload);
+                if (payload.type === "premium" && payload.user_id == user.id) {
+                    userData.isPremium = true;
+                    updateUI();
+                    saveUserData();
+                    document.getElementById("premiumBadge").style.display = "inline-block";
+                    document.getElementById("profile-premium").innerText = "Да";
+                    showToast("💎 Premium активирован!", false);
+                }
+            } catch(e) {}
+        });
+        
+        // UI обновление
+        function updateUI() {
+            document.getElementById("tokens").innerText = userData.tokens.toLocaleString();
+            document.getElementById("aura").innerText = userData.aura.toLocaleString();
+            document.getElementById("profile-tokens").innerText = userData.tokens.toLocaleString();
+            document.getElementById("profile-aura").innerText = userData.aura.toLocaleString();
+            document.getElementById("profile-nickname").innerText = userData.nickname || user.first_name || "Игрок";
+            document.getElementById("reputation").innerText = userData.reputation;
+            document.getElementById("total-bets").innerText = userData.total_bets;
+            document.getElementById("total-wins").innerText = userData.total_wins;
+            document.getElementById("referralCount").innerText = userData.referrals?.length || 0;
+            document.getElementById("referralBonus").innerText = userData.referralBonus?.toLocaleString() || "0";
+            
+            let level = 1, progress = 0, need = 15;
+            const levels = [15, 50, 75, 125, 175, 250, 350, 500, 775, 1000];
+            for (let i = 0; i < levels.length; i++) {
+                if (userData.level_points <= levels[i]) {
+                    level = i + 1;
+                    progress = userData.level_points - (i > 0 ? levels[i-1] : 0);
+                    need = levels[i] - (i > 0 ? levels[i-1] : 0);
+                    break;
+                }
+                if (i === levels.length - 1) { level = 11; progress = userData.level_points - levels[9]; need = 1000; }
+            }
+            document.getElementById("level").innerText = level;
+            
+            let rankName = "Водолаз", percent = 0, nextAura = 5000;
+            if (userData.aura >= 20001) { rankName = "Пахан"; nextAura = 50000; percent = Math.min(100, (userData.aura - 20001) / 29999 * 100); }
+            else if (userData.aura >= 10001) { rankName = "Авторитет"; nextAura = 20000; percent = Math.min(100, (userData.aura - 10001) / 9999 * 100); }
+            else if (userData.aura >= 5001) { rankName = "Хлопчик"; nextAura = 10000; percent = Math.min(100, (userData.aura - 5001) / 4999 * 100); }
+            else { percent = Math.min(100, userData.aura / 5000 * 100); }
+            document.getElementById("rank-name").innerText = rankName;
+            document.getElementById("rank-badge").innerText = rankName;
+            document.getElementById("rank-progress").style.width = percent + "%";
+            document.getElementById("rank-next").innerHTML = `До следующего ранга: ${Math.max(0, nextAura - userData.aura)} ауры`;
+        }
+        
+        function startLootTimer(duration) {
+            if (lootTimerInterval) clearInterval(lootTimerInterval);
+            const endTime = Date.now() + duration;
+            lootTimerInterval = setInterval(() => {
+                const remaining = endTime - Date.now();
+                if (remaining <= 0) {
+                    clearInterval(lootTimerInterval);
+                    lootAvailable = true;
+                    document.getElementById("loot-timer").innerHTML = "✅ Готов к луту!";
+                } else {
+                    const hours = Math.floor(remaining / 3600000);
+                    const minutes = Math.floor((remaining % 3600000) / 60000);
+                    document.getElementById("loot-timer").innerHTML = `⏳ ${hours}ч ${minutes}м`;
+                }
+            }, 1000);
+        }
+        
+        function startBonusTimer(duration) {
+            if (bonusTimerInterval) clearInterval(bonusTimerInterval);
+            const endTime = Date.now() + duration;
+            bonusTimerInterval = setInterval(() => {
+                const remaining = endTime - Date.now();
+                if (remaining <= 0) {
+                    clearInterval(bonusTimerInterval);
+                    dailyBonus.available = true;
+                    document.getElementById("bonus-timer").innerHTML = "✅ Готов!";
+                } else {
+                    const hours = Math.floor(remaining / 3600000);
+                    const minutes = Math.floor((remaining % 3600000) / 60000);
+                    document.getElementById("bonus-timer").innerHTML = `⏳ ${hours}ч ${minutes}м`;
+                }
+            }, 1000);
+        }
+        
+        function startTimers() {
+            if (userData.lastLootTime) {
+                const lastLoot = new Date(userData.lastLootTime);
+                const cooldown = userData.isPremium ? 3600000 : 5400000;
+                const elapsed = Date.now() - lastLoot;
+                if (elapsed < cooldown) {
+                    lootAvailable = false;
+                    startLootTimer(cooldown - elapsed);
+                } else {
+                    lootAvailable = true;
+                    document.getElementById("loot-timer").innerHTML = "✅ Готов к луту!";
+                }
+            }
+            if (userData.lastBonusDate) {
+                const lastBonus = new Date(userData.lastBonusDate);
+                const elapsed = Date.now() - lastBonus;
+                if (elapsed < 86400000) {
+                    dailyBonus.available = false;
+                    startBonusTimer(86400000 - elapsed);
+                } else {
+                    dailyBonus.available = true;
+                    document.getElementById("bonus-timer").innerHTML = "✅ Готов!";
+                }
+            }
+        }
+        
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById("toast");
+            toast.style.backgroundColor = isError ? "#ff4757" : "#00b4ff";
+            toast.innerText = msg;
+            toast.style.display = "block";
+            setTimeout(() => { toast.style.display = "none"; }, 3000);
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(isError ? 'error' : 'success');
+        }
+        
+        // Админ функции
+        function adminGiveTokens() {
+            const targetId = prompt("ID:");
+            if (!targetId) return;
+            const amount = parseInt(prompt("Сколько?"));
+            if (!amount) return;
+            const targetKey = `glb_user_${targetId}`;
+            const targetData = localStorage.getItem(targetKey);
+            if (targetData) {
+                let targetUser = JSON.parse(targetData);
+                targetUser.tokens = (targetUser.tokens || 0) + amount;
+                localStorage.setItem(targetKey, JSON.stringify(targetUser));
+                showToast(`✅ Выдано ${amount}💰`, false);
+            } else { showToast("❌ Не найден", true); }
+        }
+        
+        function adminGivePremium() {
+            const targetId = prompt("ID:");
+            if (!targetId) return;
+            const targetKey = `glb_user_${targetId}`;
+            const targetData = localStorage.getItem(targetKey);
+            if (targetData) {
+                let targetUser = JSON.parse(targetData);
+                targetUser.isPremium = true;
+                localStorage.setItem(targetKey, JSON.stringify(targetUser));
+                showToast(`✅ Выдан премиум`, false);
+            } else { showToast("❌ Не найден", true); }
+        }
+        
+        function adminClearData() {
+            if (confirm("Очистить ВСЕ данные?")) {
+                localStorage.clear();
+                showToast("✅ Очищено!", false);
+                setTimeout(() => location.reload(), 2000);
+            }
+        }
+        
+        // Навигация
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+                document.getElementById(`page-${item.dataset.page}`).classList.add('active-page');
+                if (item.dataset.page === 'profile') updateInventoryUI();
+                if (item.dataset.page === 'clan') updateClanUI();
+            });
+        });
+        
+        loadUserData();
+        tg.ready();
+    </script>
+</body>
+</html>
