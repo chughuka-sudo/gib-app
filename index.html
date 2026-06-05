@@ -470,6 +470,37 @@
             margin-right: 8px;
             margin-top: 8px;
         }
+        
+        .copy-btn {
+            background: rgba(0, 180, 255, 0.3);
+            border: 1px solid #00b4ff;
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        
+        .command-code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            display: inline-block;
+            margin: 2px 0;
+        }
+        
+        .copy-command {
+            background: #00b4ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 6px;
+        }
     </style>
 </head>
 <body>
@@ -478,8 +509,9 @@
         <span id="onlineCount">1</span> онлайн
     </div>
     <div id="adminPanel" class="admin-panel">
-        <div class="admin-btn" onclick="adminAction('give_tokens')">➕ Выдать токены</div>
-        <div class="admin-btn" onclick="adminAction('give_premium')">💎 Выдать премиум</div>
+        <div class="admin-btn" onclick="copyCommand('give токены 1000000 (ответом на сообщение)')">➕ Выдать токены</div>
+        <div class="admin-btn" onclick="copyCommand('give ауру 10000 (ответом на сообщение)')">✨ Выдать ауру</div>
+        <div class="admin-btn" onclick="copyCommand('/premium (ответом на сообщение)')">💎 Выдать премиум</div>
     </div>
 
     <div id="app">
@@ -509,7 +541,7 @@
                         <div class="mining-btc" id="btcAmount">0</div>
                         <div>💰 Стоимость: <span id="btcValue">0</span>💰</div>
                         <div id="miningStatus">Нет активной фермы</div>
-                        <button class="btn" onclick="sendCommand('/майнинг')">💰 Управление фермой</button>
+                        <button class="btn" onclick="copyCommand('/майнинг')">💰 Управление фермой</button>
                     </div>
                 </div>
 
@@ -517,7 +549,7 @@
                     <div class="card-header">🎁 ЕЖЕДНЕВНЫЙ БОНУС</div>
                     <div style="display: flex; justify-content: space-between;">
                         <div>📅 День <span id="streak-day">1</span>/7</div>
-                        <button class="btn-outline" onclick="sendCommand('/daily')">Забрать</button>
+                        <button class="btn-outline" onclick="copyCommand('ежедневный бонус')">Забрать</button>
                     </div>
                     <div style="font-size: 12px; color: #aaa; margin-top: 8px;" id="bonus-timer">Доступно сейчас!</div>
                 </div>
@@ -526,7 +558,7 @@
                     <div class="card-header">⏱️ ЛУТ</div>
                     <div style="display: flex; justify-content: space-between;">
                         <div>🎲 Награда: 750-2500 токенов</div>
-                        <button class="btn-outline" onclick="sendCommand('/лут')">Лутануть</button>
+                        <button class="btn-outline" onclick="copyCommand('лут')">Лутануть</button>
                     </div>
                     <div style="font-size: 12px; color: #aaa; margin-top: 8px;" id="loot-timer">Готов к луту!</div>
                 </div>
@@ -534,19 +566,23 @@
                 <div class="card">
                     <div class="card-header">🎮 ИГРЫ КАЗИНО</div>
                     <div class="game-grid">
-                        <div class="game-card" onclick="sendCommand('/рулетка помощь')"><div class="game-emoji">🎡</div><div class="game-name">Рулетка</div></div>
-                        <div class="game-card" onclick="sendCommand('/краш помощь')"><div class="game-emoji">💥</div><div class="game-name">Краш</div></div>
-                        <div class="game-card" onclick="sendCommand('/монетка помощь')"><div class="game-emoji">🪙</div><div class="game-name">Орёл/Решка</div></div>
-                        <div class="game-card" onclick="sendCommand('/дрим помощь')"><div class="game-emoji">🪄</div><div class="game-name">DreamCatcher</div></div>
+                        <div class="game-card" onclick="copyCommand('рулетка помощь')"><div class="game-emoji">🎡</div><div class="game-name">Рулетка</div></div>
+                        <div class="game-card" onclick="copyCommand('краш помощь')"><div class="game-emoji">💥</div><div class="game-name">Краш</div></div>
+                        <div class="game-card" onclick="copyCommand('орёл 100')"><div class="game-emoji">🪙</div><div class="game-name">Орёл/Решка</div></div>
+                        <div class="game-card" onclick="copyCommand('дрим 100 5')"><div class="game-emoji">🪄</div><div class="game-name">DreamCatcher</div></div>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-header">👤 УПРАВЛЕНИЕ</div>
-                    <input type="text" id="nicknameInput" class="nick-input" placeholder="Новый никнейм (макс 32 символа)">
-                    <button class="btn-outline" onclick="changeNickname()">✏️ Сменить ник (500💰)</button>
-                    <button class="btn premium-btn" onclick="sendCommand('/premium')">⭐ Купить Premium</button>
+                    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                        <input type="text" id="nicknameInput" class="nick-input" placeholder="Новый никнейм" style="flex:1;">
+                        <button class="btn-outline" onclick="changeNickname()">✏️ Сменить</button>
+                    </div>
+                    <button class="btn premium-btn" onclick="copyCommand('/premium')">⭐ Купить Premium (20 Stars)</button>
                     <button class="btn-outline" onclick="openTransferModal()">💸 Перевод токенов</button>
+                    <button class="btn-outline" onclick="copyCommand('баланс')">📊 Мой баланс</button>
+                    <button class="btn-outline" onclick="copyCommand('инвентарь')">🎒 Инвентарь</button>
                 </div>
 
                 <div class="card">
@@ -601,11 +637,11 @@
                 <div class="card">
                     <div class="card-header">🏴‍☠️ КЛАН</div>
                     <input type="text" id="clanNameInput" class="nick-input" placeholder="Название клана">
-                    <button class="btn-outline" onclick="sendCommand(`/создать клан ${document.getElementById('clanNameInput').value}`)">Создать клан</button>
+                    <button class="btn-outline" onclick="copyCommandWithValue('создать клан', 'clanNameInput')">Создать клан</button>
                     <input type="text" id="clanIdInput" class="nick-input" placeholder="ID клана">
-                    <button class="btn-outline" onclick="sendCommand(`/вступить клан ${document.getElementById('clanIdInput').value}`)">Вступить в клан</button>
-                    <button class="btn-outline" onclick="sendCommand('/покинуть клан')">Покинуть клан</button>
-                    <button class="btn-outline" onclick="sendCommand('/клан бонус')">🎁 Клан бонус</button>
+                    <button class="btn-outline" onclick="copyCommandWithValue('вступить клан', 'clanIdInput')">Вступить в клан</button>
+                    <button class="btn-outline" onclick="copyCommand('покинуть клан')">Покинуть клан</button>
+                    <button class="btn-outline" onclick="copyCommand('клан бонус')">🎁 Клан бонус</button>
                     <div id="clanInfo" class="clan-card" style="display: none;"></div>
                 </div>
             </div>
@@ -614,55 +650,58 @@
         <div id="page-commands" class="page">
             <div class="main-screen">
                 <div class="card">
+                    <div class="card-header">📋 БЫСТРЫЕ КОМАНДЫ</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;">
+                        <button class="business-btn" onclick="copyCommand('лут')">🎲 Лут</button>
+                        <button class="business-btn" onclick="copyCommand('баланс')">💰 Баланс</button>
+                        <button class="business-btn" onclick="copyCommand('инвентарь')">🎒 Инвентарь</button>
+                        <button class="business-btn" onclick="copyCommand('топ')">🏆 Топ</button>
+                        <button class="business-btn" onclick="copyCommand('мой бизнес')">🏢 Мой бизнес</button>
+                        <button class="business-btn" onclick="copyCommand('бизнесы')">📋 Бизнесы</button>
+                    </div>
+                </div>
+                <div class="card">
                     <div class="card-header">📋 ДОСТУПНЫЕ КОМАНДЫ</div>
                     <div class="command-list">
                         <div class="command-category">💰 Экономика:</div>
-                        • лут - получить награду<br>
-                        • баланс - проверить баланс<br>
-                        • топ - топ игроков<br>
-                        • перевод [сумма] (ответом)<br>
-                        • инвентарь - посмотреть предметы<br>
-                        • /nick [имя] - сменить ник<br><br>
+                        • <span class="command-code">лут</span> <button class="copy-command" onclick="copyCommand('лут')">Копировать</button> - получить награду<br>
+                        • <span class="command-code">баланс</span> <button class="copy-command" onclick="copyCommand('баланс')">Копировать</button> - проверить баланс<br>
+                        • <span class="command-code">топ</span> <button class="copy-command" onclick="copyCommand('топ')">Копировать</button> - топ игроков<br>
+                        • <span class="command-code">перевод 1000</span> <button class="copy-command" onclick="copyCommand('перевод 1000')">Копировать</button> (ответом)<br>
+                        • <span class="command-code">инвентарь</span> <button class="copy-command" onclick="copyCommand('инвентарь')">Копировать</button><br>
+                        • <span class="command-code">/nick Имя</span> <button class="copy-command" onclick="copyCommand('/nick НовыйНик')">Копировать</button><br><br>
 
                         <div class="command-category">🎰 Казино:</div>
-                        • р [ставка] [условия] - рулетка<br>
-                        • краш [ставка] [x] [x2] [x3] - краш<br>
-                        • орёл/решка/ребро [ставка] - монетка<br>
-                        • кнб [ставка] (ответом) - КНБ<br>
-                        • кубы [2-5] [ставка] (ответом) - кубы<br>
-                        • дрим [ставка] [множитель] - DreamCatcher<br><br>
+                        • <span class="command-code">р 1000 красный</span> <button class="copy-command" onclick="copyCommand('р 1000 красный')">Копировать</button> - рулетка<br>
+                        • <span class="command-code">краш 1000 2.5 3.0</span> <button class="copy-command" onclick="copyCommand('краш 1000 2.5 3.0')">Копировать</button><br>
+                        • <span class="command-code">орёл 100</span> <button class="copy-command" onclick="copyCommand('орёл 100')">Копировать</button><br>
+                        • <span class="command-code">кнб 1000</span> <button class="copy-command" onclick="copyCommand('кнб 1000')">Копировать</button> (ответом)<br>
+                        • <span class="command-code">кубы 2 1000</span> <button class="copy-command" onclick="copyCommand('кубы 2 1000')">Копировать</button> (ответом)<br>
+                        • <span class="command-code">дрим 100 5</span> <button class="copy-command" onclick="copyCommand('дрим 100 5')">Копировать</button><br><br>
 
                         <div class="command-category">🏢 Бизнес:</div>
-                        • /бизнесы - список бизнесов<br>
-                        • /купить [ID] - купить бизнес<br>
-                        • /мои_бизнесы - управление<br>
-                        • /продлить [ID] [часы] - продлить аренду<br>
-                        • /сырье [ID] [кол-во] - купить сырьё<br>
-                        • /забрать [ID] - забрать доход<br><br>
+                        • <span class="command-code">/бизнесы</span> <button class="copy-command" onclick="copyCommand('/бизнесы')">Копировать</button><br>
+                        • <span class="command-code">/купить shop</span> <button class="copy-command" onclick="copyCommand('/купить shop')">Копировать</button><br>
+                        • <span class="command-code">/мои_бизнесы</span> <button class="copy-command" onclick="copyCommand('/мои_бизнесы')">Копировать</button><br>
+                        • <span class="command-code">/продлить shop 5</span> <button class="copy-command" onclick="copyCommand('/продлить shop 5')">Копировать</button><br>
+                        • <span class="command-code">/сырье shop 100</span> <button class="copy-command" onclick="copyCommand('/сырье shop 100')">Копировать</button><br>
+                        • <span class="command-code">/забрать shop</span> <button class="copy-command" onclick="copyCommand('/забрать shop')">Копировать</button><br><br>
 
                         <div class="command-category">⚡ Эффекты:</div>
-                        • /cashback - активировать кэшбэк<br>
-                        • /skip - сбросить кулдауны<br>
-                        • /cheat - активировать читы<br><br>
+                        • <span class="command-code">/cashback</span> <button class="copy-command" onclick="copyCommand('/cashback')">Копировать</button><br>
+                        • <span class="command-code">/skip</span> <button class="copy-command" onclick="copyCommand('/skip')">Копировать</button><br>
+                        • <span class="command-code">/cheat</span> <button class="copy-command" onclick="copyCommand('/cheat')">Копировать</button><br><br>
 
                         <div class="command-category">👥 Социальное:</div>
-                        • +реп/-реп (ответом)<br>
-                        • создать клан [название]<br>
-                        • вступить клан [ID]<br>
-                        • покинуть клан<br>
-                        • клан бонус<br><br>
+                        • <span class="command-code">+реп</span> <button class="copy-command" onclick="copyCommand('+реп')">Копировать</button> (ответом)<br>
+                        • <span class="command-code">создать клан Название</span> <button class="copy-command" onclick="copyCommand('создать клан Название')">Копировать</button><br>
+                        • <span class="command-code">вступить клан ID</span> <button class="copy-command" onclick="copyCommand('вступить клан ID')">Копировать</button><br>
+                        • <span class="command-code">клан бонус</span> <button class="copy-command" onclick="copyCommand('клан бонус')">Копировать</button><br><br>
 
                         <div class="command-category">🐙 Ивенты:</div>
-                        • /ивент старт - запуск Кракена<br>
-                        • /атака - атаковать<br>
-                        • /кракен статус<br><br>
-
-                        <div class="command-category">🛠️ Админ:</div>
-                        • мут/бан/размут/разбан (ответом)<br>
-                        • give [токены/ауру] [сумма] (ответом)<br>
-                        • вознесись/павший<br>
-                        • божество/смертный<br>
-                        • /датьпредмет [предмет] [кол-во]<br>
+                        • <span class="command-code">/ивент старт</span> <button class="copy-command" onclick="copyCommand('/ивент старт')">Копировать</button><br>
+                        • <span class="command-code">/атака</span> <button class="copy-command" onclick="copyCommand('/атака')">Копировать</button><br>
+                        • <span class="command-code">/кракен статус</span> <button class="copy-command" onclick="copyCommand('/кракен статус')">Копировать</button>
                     </div>
                 </div>
             </div>
@@ -683,6 +722,9 @@
             <input type="text" id="transferUserId" class="amount-input" placeholder="ID получателя" style="margin-bottom: 10px;">
             <input type="number" id="transferAmount" class="amount-input" placeholder="Сумма" style="margin-bottom: 20px;">
             <button class="btn" onclick="sendTransfer()">Отправить</button>
+            <div style="font-size: 12px; color: #aaa; margin-top: 10px; text-align: center;">
+                ℹ️ После нажатия вставьте команду в чат и отправьте ответом на сообщение пользователя
+            </div>
         </div>
     </div>
 
@@ -713,7 +755,7 @@
         document.getElementById("user-id").innerText = user.id;
         if (isAdmin) document.getElementById("adminPanel").style.display = "block";
         
-        // Данные пользователя (локальное хранилище для демо)
+        // Данные пользователя (локальное хранилище)
         let userData = {
             tokens: 12500,
             aura: 2500,
@@ -766,6 +808,74 @@
         function saveUserData() {
             localStorage.setItem(`glb_app_${user.id}`, JSON.stringify(userData));
             localStorage.setItem(`glb_businesses_${user.id}`, JSON.stringify(businesses));
+        }
+        
+        // Копирование команды в буфер обмена (без отправки через WebApp)
+        function copyCommand(command) {
+            navigator.clipboard.writeText(command).then(() => {
+                showToast(`✅ Команда скопирована: ${command}`, false);
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            }).catch(() => {
+                showToast(`❌ Не удалось скопировать`, true);
+            });
+        }
+        
+        function copyCommandWithValue(commandPrefix, inputId) {
+            const value = document.getElementById(inputId).value;
+            if (!value) {
+                showToast(`Введите значение!`, true);
+                return;
+            }
+            const fullCommand = `${commandPrefix} ${value}`;
+            copyCommand(fullCommand);
+        }
+        
+        function sendTransfer() {
+            const targetId = document.getElementById("transferUserId").value;
+            const amount = document.getElementById("transferAmount").value;
+            if (!targetId || !amount || amount <= 0) {
+                showToast("Введите ID и сумму!", true);
+                return;
+            }
+            const command = `перевод ${amount}`;
+            copyCommand(command);
+            showToast(`Команда скопирована! Отправьте её ответом на сообщение пользователя с ID ${targetId}`, false);
+            closeModal("transferModal");
+        }
+        
+        function changeNickname() {
+            const newNick = document.getElementById("nicknameInput").value.trim();
+            if (!newNick) {
+                showToast("Введите никнейм!", true);
+                return;
+            }
+            if (newNick.length > 32) {
+                showToast("Максимум 32 символа!", true);
+                return;
+            }
+            if (userData.tokens < 500 && !userData.is_overseer) {
+                showToast("Нужно 500💰 для смены ника!", true);
+                return;
+            }
+            if (!userData.is_overseer) userData.tokens -= 500;
+            userData.nickname = newNick;
+            saveUserData();
+            updateAllUI();
+            copyCommand(`/nick ${newNick}`);
+            showToast(`Никнейм изменён на ${newNick}`, false);
+        }
+        
+        function showReferral() {
+            const botUsername = "GLBBot";
+            const refCode = user.id;
+            document.getElementById("referralLink").innerHTML = `https://t.me/${botUsername}?start=ref_${refCode}`;
+            document.getElementById("referralModal").style.display = "flex";
+        }
+        
+        function copyReferralLink() {
+            const link = document.getElementById("referralLink").innerText;
+            navigator.clipboard.writeText(link);
+            showToast("✅ Ссылка скопирована!", false);
         }
         
         function updateAllUI() {
@@ -853,8 +963,8 @@
                             <div>💰 Доход: ${biz.pending_income?.toLocaleString() || 0}💰</div>
                         </div>
                         <div class="business-actions">
-                            <button class="business-btn" onclick="sendCommand('/управление ${biz.id}')">⚙️ Управление</button>
-                            <button class="business-btn" onclick="sendCommand('/забрать ${biz.id}')">💰 Забрать доход</button>
+                            <button class="business-btn" onclick="copyCommand('/управление ${biz.id}')">⚙️ Управление</button>
+                            <button class="business-btn" onclick="copyCommand('/забрать ${biz.id}')">💰 Забрать доход</button>
                         </div>
                     </div>
                 `;
@@ -888,80 +998,11 @@
                             <div>📈 Доход: ${biz.income_per_hour.toLocaleString()}💰/час</div>
                             <div>📦 Склад: ${biz.raw_material_max.toLocaleString()} ед.</div>
                         </div>
-                        ${!alreadyOwned ? `<button class="btn-outline" style="margin-top: 10px; width:100%;" onclick="sendCommand('/купить ${biz.id}')">💰 Купить</button>` : '<span style="color:#00ff00; text-align:center; display:block; margin-top:10px;">✅ Уже приобретён</span>'}
+                        ${!alreadyOwned ? `<button class="btn-outline" style="margin-top: 10px; width:100%;" onclick="copyCommand('/купить ${biz.id}')">💰 Купить за ${biz.price.toLocaleString()}💰</button>` : '<span style="color:#00ff00; text-align:center; display:block; margin-top:10px;">✅ Уже приобретён</span>'}
                     </div>
                 `;
             }
             container.innerHTML = html;
-        }
-        
-        // Отправка команды в бот
-        function sendCommand(cmd) {
-            tg.sendData(cmd);
-            showToast(`Команда "${cmd}" отправлена в бот`, false);
-        }
-        
-        function changeNickname() {
-            const newNick = document.getElementById("nicknameInput").value.trim();
-            if (!newNick) {
-                showToast("Введите никнейм!", true);
-                return;
-            }
-            if (newNick.length > 32) {
-                showToast("Максимум 32 символа!", true);
-                return;
-            }
-            if (userData.tokens < 500 && !userData.is_overseer) {
-                showToast("Нужно 500💰 для смены ника!", true);
-                return;
-            }
-            if (!userData.is_overseer) userData.tokens -= 500;
-            userData.nickname = newNick;
-            saveUserData();
-            updateAllUI();
-            showToast(`Никнейм изменён на ${newNick}`, false);
-            sendCommand(`/nick ${newNick}`);
-        }
-        
-        function openTransferModal() {
-            document.getElementById("transferModal").style.display = "flex";
-        }
-        
-        function sendTransfer() {
-            const targetId = document.getElementById("transferUserId").value;
-            const amount = document.getElementById("transferAmount").value;
-            if (!targetId || !amount || amount <= 0) {
-                showToast("Введите ID и сумму!", true);
-                return;
-            }
-            sendCommand(`перевод ${amount} (ответом на сообщение пользователя)`);
-            showToast(`Запрос на перевод ${amount}💰 отправлен`, false);
-            closeModal("transferModal");
-        }
-        
-        function showReferral() {
-            const botUsername = "GLBBot";
-            const refCode = user.id;
-            document.getElementById("referralLink").innerHTML = `https://t.me/${botUsername}?start=ref_${refCode}`;
-            document.getElementById("referralModal").style.display = "flex";
-        }
-        
-        function copyReferralLink() {
-            const link = document.getElementById("referralLink").innerText;
-            navigator.clipboard.writeText(link);
-            showToast("✅ Ссылка скопирована!", false);
-        }
-        
-        function adminAction(action) {
-            const targetId = prompt("ID пользователя:");
-            if (!targetId) return;
-            if (action === 'give_tokens') {
-                const amount = prompt("Сумма токенов:");
-                if (amount) sendCommand(`give токены ${amount} (ответом на сообщение)`);
-            } else if (action === 'give_premium') {
-                sendCommand(`/premium (ответом на сообщение)`);
-            }
-            showToast("Запрос отправлен", false);
         }
         
         function showToast(msg, isError) {
@@ -971,6 +1012,10 @@
             toast.style.display = "block";
             setTimeout(() => { toast.style.display = "none"; }, 3000);
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(isError ? 'error' : 'success');
+        }
+        
+        function openTransferModal() {
+            document.getElementById("transferModal").style.display = "flex";
         }
         
         function closeModal(modalId) {
@@ -1002,4 +1047,4 @@
         tg.ready();
     </script>
 </body>
-</html>
+    </html>
