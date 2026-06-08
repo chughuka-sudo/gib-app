@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Мессенджер — Офлайн-менеджер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ТЕМЫ */
+        :root {
+            --bg-page: #ffffff;
+            --card-bg: #f5f5f7;
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --accent: #007aff;
+            --accent-hover: #0055b3;
+            --border: rgba(0, 0, 0, 0.08);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            --bubble-own: #007aff;
+            --bubble-own-text: white;
+            --bubble-other: #e5e5ea;
+            --bubble-other-text: #000000;
+            --input-bg: #f5f5f7;
+            --separator-bg: rgba(0,0,0,0.05);
+            --header-bg: rgba(255,255,255,0.96);
+        }
+        [data-theme="dark"] {
+            --bg-page: #0b0b12;
+            --card-bg: #1c1c24;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e98;
+            --accent: #0a84ff;
+            --accent-hover: #409cff;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --bubble-own: #007aff;
+            --bubble-own-text: white;
+            --bubble-other: #1c1c24;
+            --bubble-other-text: #ffffff;
+            --input-bg: #1c1c24;
+            --separator-bg: rgba(255,255,255,0.05);
+            --header-bg: rgba(11,11,18,0.96);
+        }
+
+        body {
+            background: var(--bg-page);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.2s ease;
+        }
+
+        /* ЭКРАН ЧАТА (основное приложение) */
+        .chat-app {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .chat-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 0.5px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn, .call-btn, .search-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .avatar-header {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        .chat-info { flex: 1; }
+        .chat-name { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+        .chat-status { font-size: 12px; color: var(--text-secondary); }
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .message-row {
+            display: flex;
+            margin-bottom: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+        .message-row.own { justify-content: flex-end; }
+        .message-row.other { justify-content: flex-start; }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .message-row.own .avatar { display: none; }
+        .message-bubble-wrapper { max-width: 75%; }
+        .message-bubble {
+            padding: 8px 12px;
+            font-size: 15px;
+            line-height: 1.4;
+            border-radius: 18px;
+        }
+        .own .message-bubble {
+            background: var(--bubble-own);
+            color: var(--bubble-own-text);
+            border-radius: 18px 18px 6px 18px;
+        }
+        .other .message-bubble {
+            background: var(--bubble-other);
+            color: var(--bubble-other-text);
+            border-radius: 18px 18px 18px 6px;
+        }
+        .message-meta {
+            display: flex;
+            justify-content: flex-end;
+            gap: 4px;
+            margin-top: 4px;
+            font-size: 10px;
+        }
+        .input-area {
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            border-top: 0.5px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-wrapper {
+            flex: 1;
+            background: var(--input-bg);
+            border-radius: 28px;
+            padding: 8px 16px;
+        }
+        .input-wrapper input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+        .send-btn {
+            background: var(--accent);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ОФЛАЙН ЭКРАН */
+        .offline-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: var(--bg-page);
+            padding: 20px;
+        }
+        .offline-card {
+            max-width: 340px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 36px;
+            padding: 44px 28px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .offline-card h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 16px 0 12px;
+        }
+        .offline-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            line-height: 1.4;
+        }
+        .retry-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: 40px;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 590;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        .retry-btn:active { transform: scale(0.97); }
+        .status-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+
+        /* Переключатель темы */
+        .theme-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            z-index: 200;
+            box-shadow: var(--shadow);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ЭКРАН ОФЛАЙН -->
+<div id="offlineScreen" class="offline-screen" style="display: none;">
+    <div class="offline-card">
+        <div style="font-size: 64px;">📡</div>
+        <h2 id="offlineTitle">Нет соединения</h2>
+        <p id="offlineMessage">Проверьте интернет и нажмите кнопку ниже</p>
+        <button class="retry-btn" id="retryConnectionBtn">⟳ Проверить соединение</button>
+        <div class="status-text" id="offlineStatus">Ожидание...</div>
+    </div>
+</div>
+
+<!-- ОСНОВНОЙ ЧАТ -->
+<div id="chatApp" class="chat-app">
+    <div class="chat-header">
+        <button class="back-btn" id="backBtn">←</button>
+        <div class="avatar-header" id="headerAvatar">U</div>
+        <div class="chat-info">
+            <div class="chat-name">Алексей</div>
+            <div class="chat-status" id="onlineStatus">онлайн</div>
+        </div>
+        <button class="search-btn" id="searchBtn">🔍</button>
+        <button class="call-btn" id="callBtn">📞</button>
+    </div>
+    <div class="messages-container" id="messagesContainer">
+        <!-- Сообщения будут тут -->
+    </div>
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="messageInput" placeholder="Сообщение" autocomplete="off">
+        </div>
+        <button class="send-btn" id="sendBtn">➤</button>
+    </div>
+</div>
+
+<button class="theme-fab" id="themeToggle">🌙 Тёмная тема</button>
+
+<script>
+    // ==================== 1. ТЕМА ====================
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeToggle');
+    if (localStorage.getItem('app_theme') === 'dark') {
+        root.setAttribute('data-theme', 'dark');
+        themeBtn.innerHTML = '☀️ Светлая тема';
+    }
+    themeBtn.addEventListener('click', () => {
+        const isDark = root.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            root.removeAttribute('data-theme');
+            localStorage.setItem('app_theme', 'light');
+            themeBtn.innerHTML = '🌙 Тёмная тема';
+        } else {
+            root.setAttribute('data-theme', 'dark');
+            localStorage.setItem('app_theme', 'dark');
+            themeBtn.innerHTML = '☀️ Светлая тема';
+        }
+    });
+
+    // ==================== 2. УНИВЕРСАЛЬНАЯ ПРОВЕРКА ИНТЕРНЕТА ====================
+    let isOnlineGlobal = false;
+    let checkInProgress = false;
+
+    async function checkInternet() {
+        if (checkInProgress) return false;
+        checkInProgress = true;
+        
+        // Быстрая проверка через navigator.onLine
+        if (!navigator.onLine) {
+            checkInProgress = false;
+            return false;
+        }
+        
+        // Реальная проверка через загрузку маленького ресурса (работает в APK, TMA, браузере)
+        const result = await new Promise((resolve) => {
+            const img = new Image();
+            let resolved = false;
+            const timeout = setTimeout(() => {
+                if (!resolved) {
+                    resolved = true;
+                    resolve(false);
+                }
+            }, 5000);
+            img.onload = () => {
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeout);
+                    resolve(true);
+                }
+            };
+            img.onerror = () => {
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeout);
+                    resolve(false);
+                }
+            };
+            // Надёжный маленький ресурс
+            img.src = 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png?_=' + Date.now();
+        });
+        
+        checkInProgress = false;
+        return result;
+    }
+
+    // ==================== 3. УПРАВЛЕНИЕ ЭКРАНАМИ ====================
+    const offlineScreen = document.getElementById('offlineScreen');
+    const chatApp = document.getElementById('chatApp');
+    const retryBtn = document.getElementById('retryConnectionBtn');
+    const offlineTitle = document.getElementById('offlineTitle');
+    const offlineMessage = document.getElementById('offlineMessage');
+    const offlineStatus = document.getElementById('offlineStatus');
+    
+    let autoRetryInterval = null;
+    let countdownInterval = null;
+    let countdownSeconds = 5;
+    
+    // Показать офлайн-экран
+    function showOfflineScreen(reason = 'no_internet') {
+        if (autoRetryInterval) clearInterval(autoRetryInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
+        offlineScreen.style.display = 'flex';
+        chatApp.style.display = 'none';
+        
+        if (reason === 'no_internet') {
+            offlineTitle.innerText = 'Нет соединения';
+            offlineMessage.innerText = 'Проверьте интернет и нажмите кнопку ниже';
+        } else {
+            offlineTitle.innerText = 'Ожидание сети';
+            offlineMessage.innerText = 'Мы автоматически проверим соединение...';
+        }
+        
+        startAutoRetry();
+    }
+    
+    // Показать чат (основное приложение)
+    function showChatApp() {
+        if (autoRetryInterval) clearInterval(autoRetryInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
+        offlineScreen.style.display = 'none';
+        chatApp.style.display = 'flex';
+        // Обновляем статус онлайн
+        document.getElementById('onlineStatus').innerHTML = 'онлайн ✅';
+        setTimeout(() => {
+            document.getElementById('onlineStatus').innerHTML = 'онлайн';
+        }, 3000);
+    }
+    
+    // Запуск авто-проверки с обратным отсчётом
+    function startAutoRetry() {
+        if (autoRetryInterval) clearInterval(autoRetryInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
+        
+        countdownSeconds = 5;
+        offlineStatus.innerText = `Автопроверка через ${countdownSeconds} сек...`;
+        
+        countdownInterval = setInterval(() => {
+            countdownSeconds--;
+            if (countdownSeconds <= 0) {
+                clearInterval(countdownInterval);
+                offlineStatus.innerText = `Проверка...`;
+                performCheckAndDecide();
+            } else {
+                offlineStatus.innerText = `Автопроверка через ${countdownSeconds} сек...`;
+            }
+        }, 1000);
+    }
+    
+    // Проверка и решение: показывать чат или остаться офлайн
+    async function performCheckAndDecide() {
+        const isOnline = await checkInternet();
+        if (isOnline) {
+            // Интернет есть — показываем чат
+            showChatApp();
+        } else {
+            // Нет интернета — остаёмся на офлайн-экране и запускаем новый цикл
+            offlineStatus.innerText = 'Нет соединения';
+            startAutoRetry();
+        }
+    }
+    
+    // Ручная проверка по кнопке
+    retryBtn.addEventListener('click', async () => {
+        retryBtn.disabled = true;
+        retryBtn.innerText = '⟳ Проверка...';
+        offlineStatus.innerText = 'Проверка соединения...';
+        
+        const isOnline = await checkInternet();
+        
+        if (isOnline) {
+            showChatApp();
+        } else {
+            offlineStatus.innerText = '❌ Нет интернета';
+            offlineTitle.innerText = 'Нет соединения';
+            offlineMessage.innerText = 'Проверьте Wi-Fi/мобильные данные';
+            startAutoRetry();
+        }
+        
+        retryBtn.disabled = false;
+        retryBtn.innerText = '⟳ Проверить соединение';
+    });
+    
+    // ==================== 4. ДЕМО-ЧАТ (для теста) ====================
+    let messages = [
+        { id: 1, text: "Привет! Как дела?", isOwn: false, senderName: "Алексей", time: "10:30", status: "read" },
+        { id: 2, text: "Отлично! А у тебя?", isOwn: true, time: "10:32", status: "read" },
+        { id: 3, text: "Тоже норм. Работаю над мессенджером", isOwn: false, senderName: "Алексей", time: "10:35", status: "read" },
+        { id: 4, text: "Круто! Жду результат", isOwn: true, time: "10:37", status: "read" }
+    ];
+    
+    function renderMessages() {
+        const container = document.getElementById('messagesContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        messages.forEach(msg => {
+            const row = document.createElement('div');
+            row.className = `message-row ${msg.isOwn ? 'own' : 'other'}`;
+            let avatarHtml = '';
+            if (!msg.isOwn) {
+                avatarHtml = `<div class="avatar">А</div>`;
+            }
+            row.innerHTML = `
+                ${avatarHtml}
+                <div class="message-bubble-wrapper">
+                    <div class="message-bubble">
+                        ${msg.text}
+                        <div class="message-meta">
+                            <span>${msg.time}</span>
+                            ${msg.isOwn ? '<span>✓✓</span>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function addMessage(text, isOwn = true) {
+        const now = new Date();
+        const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        messages.push({
+            id: Date.now(),
+            text: text,
+            isOwn: isOwn,
+            senderName: isOwn ? 'Я' : 'Алексей',
+            time: time,
+            status: 'read'
+        });
+        renderMessages();
+    }
+    
+    document.getElementById('sendBtn')?.addEventListener('click', () => {
+        const input = document.getElementById('messageInput');
+        if (input.value.trim()) {
+            addMessage(input.value.trim(), true);
+            input.value = '';
+            // Имитация ответа
+            setTimeout(() => {
+                addMessage('Принял! 👍', false);
+            }, 1000);
+        }
+    });
+    
+    document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('sendBtn').click();
+        }
+    });
+    
+    document.getElementById('backBtn')?.addEventListener('click', () => {
+        alert('← Назад (демо)');
+    });
+    document.getElementById('callBtn')?.addEventListener('click', () => {
+        alert('📞 Звонок (демо)');
+    });
+    document.getElementById('searchBtn')?.addEventListener('click', () => {
+        alert('🔍 Поиск (демо)');
+    });
+    
+    // ==================== 5. ЗАПУСК ====================
+    (async function init() {
+        // При первом запуске проверяем интернет
+        const hasInternet = await checkInternet();
+        
+        if (hasInternet) {
+            // Есть интернет — сразу показываем чат
+            showChatApp();
+            renderMessages();
+        } else {
+            // Нет интернета — показываем офлайн-экран
+            showOfflineScreen('no_internet');
+        }
+        
+        // Слушаем событие возвращения сети (браузерное)
+        window.addEventListener('online', async () => {
+            const nowOnline = await checkInternet();
+            if (nowOnline && chatApp.style.display === 'none') {
+                showChatApp();
+                renderMessages();
+            }
+        });
+    })();
+</script>
+</body>
+</html>
