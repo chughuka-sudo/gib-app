@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>С Днём Рождения, Назар!</title>
+    <!-- Telegram Web App стили -->
+    <meta name="telegram:channel" content="@your_channel">
+    <meta name="theme-color" content="#0a0f1e">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 10% 30%, #0a0f1e, #03060f);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', 'Poppins', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            padding: 16px;
+            overflow-x: hidden;
+        }
+
+        /* Главная карточка */
+        .card {
+            max-width: 950px;
+            width: 100%;
+            background: rgba(15, 20, 35, 0.65);
+            backdrop-filter: blur(14px);
+            border-radius: 48px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 210, 90, 0.2);
+            padding: 24px 20px 40px 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 200, 100, 0.3);
+        }
+
+        /* ========= АНИМИРОВАННЫЙ ТЕКСТ ИЗ ВОЗДУХА ========= */
+        .greeting {
+            text-align: center;
+            margin-bottom: 20px;
+            perspective: 800px;
+        }
+
+        .air-text {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(40px) rotateX(12deg) scale(0.92);
+            animation: floatFromAir 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+            will-change: transform, opacity;
+        }
+
+        .name {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFE6B0, #FFB347, #FF8C42, #FFD966);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+            display: inline-block;
+            animation-delay: 0.1s;
+        }
+
+        .alpha-line {
+            font-size: 1.4rem;
+            font-weight: 600;
+            background: linear-gradient(120deg, #F9E0A0, #FFBC6E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 18px;
+            backdrop-filter: blur(5px);
+            border-radius: 60px;
+            animation-delay: 0.35s;
+        }
+
+        .birthday-message {
+            font-size: 1.2rem;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 50px;
+            color: #ffefbf;
+            border-left: 3px solid #FFC857;
+            border-right: 3px solid #FFC857;
+            margin-top: 15px;
+            backdrop-filter: blur(4px);
+            animation-delay: 0.6s;
+        }
+
+        .extra-line {
+            animation-delay: 0.8s;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.55s; }
+        .delay-4 { animation-delay: 0.75s; }
+
+        @keyframes floatFromAir {
+            0% {
+                opacity: 0;
+                transform: translateY(55px) rotateX(18deg) scale(0.85);
+                filter: blur(6px);
+            }
+            40% {
+                opacity: 0.6;
+                transform: translateY(-5px) rotateX(4deg) scale(1.02);
+                filter: blur(2px);
+            }
+            70% {
+                opacity: 0.95;
+                transform: translateY(3px) rotateX(0deg) scale(1);
+                filter: blur(0px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .cake-canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0 20px;
+        }
+
+        canvas {
+            background: #1e1a2f;
+            border-radius: 40px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.2s;
+            touch-action: manipulation;
+        }
+        canvas:active { transform: scale(0.98); }
+
+        .btn-replay {
+            background: linear-gradient(105deg, #2a2f48, #1b1f38);
+            border: none;
+            color: #ffeaac;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 10px 24px;
+            border-radius: 44px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-top: 18px;
+            transition: 0.15s;
+            box-shadow: 0 5px 0 #0a0d18;
+            font-family: inherit;
+            touch-action: manipulation;
+        }
+        .btn-replay:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #0a0d18;
+        }
+        .footer { display: flex; justify-content: center; }
+        .hint {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #b9c3e6;
+            margin-top: 18px;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 600px) {
+            .name { font-size: 2.2rem; }
+            .alpha-line { font-size: 1rem; }
+            .birthday-message { font-size: 0.9rem; padding: 6px 16px; }
+            .card { padding: 20px 16px; }
+            .btn-replay { padding: 8px 18px; font-size: 0.9rem; }
+        }
+
+        .confetti-area {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        /* Адаптация под Telegram WebView */
+        @supports (padding: max(0px)) {
+            body {
+                padding-top: env(safe-area-inset-top, 20px);
+                padding-bottom: env(safe-area-inset-bottom, 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="greeting">
+        <div><span class="air-text name delay-1">НАЗАР</span></div>
+        <div style="margin-top: 10px;">
+            <span class="air-text alpha-line delay-2">🔥 ДЛЯ АЛЬФА СИГМАЧА, ПОВЕЛИТЕЛЯ СВОЕЙ КОМНАТЫ 🔥</span>
+        </div>
+        <div style="margin-top: 14px;">
+            <span class="air-text birthday-message delay-3">🎂 С ДНЁМ РОЖДЕНИЯ, БРО! 🎂</span>
+        </div>
+        <div style="margin-top: 10px;">
+            <span class="air-text birthday-message extra-line delay-4" style="font-size:0.95rem;">✨ Пусть твоя комната сияет, как звёздный трон ✨</span>
+        </div>
+    </div>
+
+    <div class="cake-canvas-container">
+        <canvas id="cakeCanvas" width="800" height="500" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/500"></canvas>
+    </div>
+    <div class="footer">
+        <button class="btn-replay" id="replayAnimBtn">🎬 ЗАМЕСИТЬ ТОРТ ЗАНОВО 🎂</button>
+    </div>
+    <div class="hint">
+        🌬️ Нажми на торт — выпечка начнётся заново!
+    </div>
+</div>
+
+<div class="confetti-area" id="confettiContainer"></div>
+
+<script>
+    (function(){
+        // ---------- CANVAS АНИМАЦИЯ ВЫПЕЧКИ ТОРТА ----------
+        const canvas = document.getElementById('cakeCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = 800, height = 500;
+        canvas.width = width;
+        canvas.height = height;
+        
+        let animProgress = 0;
+        let animDirection = 1;
+        let animating = true;
+        let animSpeed = 0.008;
+        
+        let particles = [];
+        const PARTICLE_COUNT = 65;
+        
+        function initParticles() {
+            particles = [];
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * (height - 80) + 40,
+                    size: 3 + Math.random() * 7,
+                    alpha: Math.random() * 0.7 + 0.3,
+                    vx: (Math.random() - 0.5) * 0.9,
+                    vy: (Math.random() - 0.5) * 0.6 - 0.2,
+                    color: `hsl(${30 + Math.random() * 40}, 80%, 65%)`
+                });
+            }
+        }
+        
+        function updateParticles(progress) {
+            for(let p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                if(p.x < -30) p.x = width+30;
+                if(p.x > width+30) p.x = -30;
+                if(p.y < -30) p.y = height-50;
+                if(p.y > height+40) p.y = -30;
+                let bakeIntensity = Math.min(1, Math.max(0, (progress - 0.2) / 0.7));
+                let glow = bakeIntensity * 0.9;
+                p.size = 3 + Math.random() * 6 + glow * 6;
+                if(progress > 0.85) p.color = `hsl(${45 + Math.random() * 25}, 95%, 68%)`;
+                else if(progress > 0.5) p.color = `hsl(${35 + Math.random() * 20}, 82%, 62%)`;
+                else p.color = `hsl(${30 + Math.random() * 40}, 75%, 58%)`;
+            }
+        }
+        
+        function drawCake(progress) {
+            ctx.clearRect(0, 0, width, height);
+            let gradBack = ctx.createLinearGradient(0, 0, 0, height);
+            gradBack.addColorStop(0, '#2c243b');
+            gradBack.addColorStop(1, '#110e1c');
+            ctx.fillStyle = gradBack;
+            ctx.fillRect(0, 0, width, height);
+            
+            let ovenGlow = Math.min(0.7, progress * 1.3);
+            ctx.globalAlpha = ovenGlow * 0.3;
+            ctx.fillStyle = '#ffaa55';
+            ctx.fillRect(0, 0, width, height);
+            ctx.globalAlpha = 1;
+            
+            // Стол
+            ctx.fillStyle = '#5d3a1a';
+            ctx.fillRect(0, height-70, width, 70);
+            ctx.fillStyle = '#8b5a2b';
+            ctx.fillRect(0, height-68, width, 12);
+            ctx.fillStyle = '#c28a40';
+            ctx.fillRect(0, height-60, width, 8);
+            
+            let cakeHeightBase = 115;
+            let currentHeight = 40 + progress * cakeHeightBase;
+            let cakeY = height - 70 - currentHeight;
+            let cakeWidthBase = 250;
+            let currentWidth = 160 + progress * (cakeWidthBase - 160);
+            let cakeX = width/2 - currentWidth/2;
+            
+            if(progress < 0.45) {
+                ctx.fillStyle = `hsl(35, 70%, ${45 + progress*20}%)`;
+                ctx.beginPath();
+                ctx.ellipse(width/2, cakeY+currentHeight*0.7, currentWidth/1.9, currentHeight*0.8, 0, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = `hsl(28, 75%, 50%)`;
+                ctx.beginPath();
+                ctx.ellipse(width/2, cakeY+currentHeight*0.5, currentWidth/2.2, currentHeight*0.6, 0, 0, Math.PI*2);
+                ctx.fill();
+            } else {
+                ctx.fillStyle = '#c98a3e';
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = "rgba(0,0,0,0.3)";
+                ctx.fillRect(cakeX, cakeY, currentWidth, currentHeight);
+                ctx.fillStyle = '#f7d68a';
+                ctx.fillRect(cakeX-4, cakeY+8, currentWidth+8, currentHeight-16);
+                ctx.fillStyle = '#f3c26b';
+                ctx.fillRect(cakeX, cakeY+5, currentWidth, currentHeight-10);
+                ctx.fillStyle = '#ffdd99';
+                ctx.beginPath();
+                ctx.ellipse(width/2, cakeY-6, currentWidth/1.9, 20, 0, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = '#b35f1a';
+                for(let i=0;i<30+progress*40;i++){
+                    ctx.fillRect(cakeX + Math.random()*currentWidth, cakeY + Math.random()*currentHeight, 2, 2);
+                }
+            }
+            
+            if(progress > 0.55) {
+                let frostingIntensity = (progress-0.55)/0.45;
+                ctx.fillStyle = `rgba(255, 215, 150, ${0.5+frostingIntensity*0.5})`;
+                for(let i=0;i<15;i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(cakeX + 15 + i*22, cakeY-4);
+                    ctx.lineTo(cakeX+25 + i*22, cakeY-15);
+                    ctx.lineTo(cakeX+5 + i*22, cakeY-15);
+                    ctx.fill();
+                }
+            }
+            
+            let candleProgress = Math.max(0, (progress - 0.7) / 0.3);
+            if(candleProgress > 0) {
+                let candleCount = 3;
+                let startX = width/2 - 35;
+                for(let i=0; i<candleCount; i++) {
+                    let cx = startX + i*35;
+                    let cy = cakeY - 12;
+                    ctx.fillStyle = '#f0a0c0';
+                    ctx.fillRect(cx-4, cy-22, 8, 28);
+                    ctx.fillStyle = '#ffd966';
+                    ctx.fillRect(cx-2, cy-24, 4, 6);
+                    let flameHeight = 14 + Math.sin(Date.now() * 0.015 + i) * 4;
+                    let flickAlpha = 0.9 + Math.sin(Date.now() * 0.02) * 0.2;
+                    ctx.fillStyle = `rgba(255, 100, 20, ${0.8 * candleProgress * flickAlpha})`;
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy-28);
+                    ctx.lineTo(cx-5, cy-24);
+                    ctx.lineTo(cx, cy-20-flameHeight*0.5);
+                    ctx.lineTo(cx+5, cy-24);
+                    ctx.fill();
+                    ctx.fillStyle = `rgba(255, 200, 50, ${0.9 * candleProgress})`;
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy-28);
+                    ctx.lineTo(cx-3, cy-24);
+                    ctx.lineTo(cx, cy-18-flameHeight*0.3);
+                    ctx.lineTo(cx+3, cy-24);
+                    ctx.fill();
+                }
+            }
+            
+            if(progress > 0.85) {
+                for(let i=0;i<28;i++) {
+                    ctx.fillStyle = `rgba(255, 215, 0, ${0.5+Math.sin(Date.now()*0.01+i)*0.3})`;
+                    ctx.beginPath();
+                    ctx.arc(cakeX + Math.random()*currentWidth, cakeY + Math.random()*currentHeight, 2+Math.random()*4, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            }
+            ctx.shadowBlur = 0;
+            if(progress > 0.68) {
+                ctx.font = `bold ${18 + Math.min(14, progress*16)}px "Montserrat", "Poppins", system-ui`;
+                ctx.fillStyle = '#3b280b';
+                ctx.shadowBlur = 3;
+                ctx.fillText("🍰 НАЗАР 🍰", width/2-65, cakeY+currentHeight/2+8);
+            }
+        }
+        
+        function launchCelebrationConfetti() {
+            const container = document.getElementById('confettiContainer');
+            while(container.firstChild) container.removeChild(container.firstChild);
+            for(let i=0;i<200;i++) {
+                const conf = document.createElement('div');
+                conf.style.position = 'absolute';
+                conf.style.width = Math.random() * 11 + 5 + 'px';
+                conf.style.height = Math.random() * 13 + 6 + 'px';
+                conf.style.backgroundColor = `hsl(${Math.random() * 360}, 85%, 62%)`;
+                conf.style.borderRadius = Math.random() > 0.6 ? '50%' : '3px';
+                conf.style.left = Math.random() * window.innerWidth + 'px';
+                conf.style.top = '-25px';
+                conf.style.opacity = '0.95';
+                conf.style.pointerEvents = 'none';
+                conf.style.zIndex = '1001';
+                conf.style.transform = `rotate(${Math.random() * 360}deg)`;
+                const duration = 2.2 + Math.random() * 3;
+                conf.style.transition = `transform ${duration}s linear, top ${duration}s ease-in`;
+                container.appendChild(conf);
+                requestAnimationFrame(() => {
+                    conf.style.top = window.innerHeight + 70 + 'px';
+                    conf.style.transform = `rotate(${Math.random() * 800}deg)`;
+                });
+                setTimeout(() => { if(conf.parentNode) conf.remove(); }, duration * 1000);
+            }
+        }
+        
+        function resetBakingAnimation() {
+            animProgress = 0;
+            animDirection = 1;
+            animating = true;
+            initParticles();
+            const container = document.getElementById('confettiContainer');
+            while(container.firstChild) container.removeChild(container.firstChild);
+        }
+        
+        function animateBaking() {
+            if(animating) {
+                if(animDirection === 1 && animProgress < 1) {
+                    animProgress += animSpeed;
+                    if(animProgress >= 1) {
+                        animProgress = 1;
+                        launchCelebrationConfetti();
+                    }
+                }
+                if(animDirection === -1 && animProgress > 0) animProgress -= animSpeed;
+                animProgress = Math.min(1, Math.max(0, animProgress));
+            }
+            updateParticles(animProgress);
+            drawCake(animProgress);
+            
+            for(let p of particles) {
+                ctx.globalAlpha = p.alpha * (0.5 + animProgress*0.8);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * (0.7 + animProgress*0.8), 0, Math.PI*2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            if(animProgress < 0.98) {
+                ctx.font = "italic 16px 'Montserrat'";
+                ctx.fillStyle = "#ffe2aa";
+                ctx.fillText(`🔥 Выпечка: ${Math.floor(animProgress*100)}%`, width-150, height-20);
+            } else {
+                ctx.font = "bold 18px 'Montserrat'";
+                ctx.fillStyle = "#FFD966";
+                ctx.fillText("✨ ТОРТ ГОТОВ! ✨", width/2-120, height-20);
+            }
+            requestAnimationFrame(animateBaking);
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            resetBakingAnimation();
+            let rect = canvas.getBoundingClientRect();
+            let x = e.clientX;
+            let y = e.clientY;
+            let spark = document.createElement('div');
+            spark.style.position='fixed'; spark.style.width='10px'; spark.style.height='10px';
+            spark.style.background='radial-gradient(#ffcc44, #ff9933)'; spark.style.borderRadius='50%';
+            spark.style.left = (x-5)+'px'; spark.style.top = (y-5)+'px';
+            spark.style.pointerEvents='none'; spark.style.zIndex='2000';
+            document.body.appendChild(spark);
+            setTimeout(()=>spark.remove(),500);
+        });
+        
+        document.getElementById('replayAnimBtn').addEventListener('click', () => {
+            resetBakingAnimation();
+            for(let i=0;i<50;i++) {
+                const star = document.createElement('div');
+                star.style.position='fixed'; star.style.width='7px'; star.style.height='7px';
+                star.style.background=`radial-gradient(#ffc085, #ffaa40)`;
+                star.style.borderRadius='50%';
+                star.style.left = Math.random() * window.innerWidth + 'px';
+                star.style.top = '20px';
+                star.style.opacity='0.9';
+                star.style.pointerEvents='none';
+                document.body.appendChild(star);
+                setTimeout(()=> star.remove(), 1200);
+                star.style.transition = 'top 1s ease';
+                setTimeout(()=> star.style.top = window.innerHeight-50+'px', 20);
+            }
+        });
+        
+        initParticles();
+        animateBaking();
+        
+        // Telegram WebApp инициализация (опционально)
+        if(window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            Telegram.WebApp.setHeaderColor('bg_color');
+        }
+    })();
+</script>
+</body>
+</html>
